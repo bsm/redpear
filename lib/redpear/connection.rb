@@ -4,7 +4,7 @@ module Redpear::Connection
   module ClassMethods
 
     def connection
-      @connection ||= (superclass.respond_to?(:connection) ? superclass.connection : Redis.new)
+      @connection ||= (superclass.respond_to?(:connection) ? superclass.connection : Redis.current)
     end
 
     def connection=(value)
