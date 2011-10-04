@@ -2,8 +2,8 @@ PATH
   remote: .
   specs:
     redpear (0.3.0)
-      nest
-      redis
+      nest (~> 1.1.0)
+      redis (~> 2.2.0)
 
 GEM
   remote: http://rubygems.org/

@@ -17,8 +17,8 @@ Gem::Specification.new do |s|
   s.require_path = 'lib'
   s.files        = Dir['lib/**/*']
 
-  s.add_dependency "redis"
-  s.add_dependency "nest"
+  s.add_dependency "redis", "~> 2.2.0"
+  s.add_dependency "nest", "~> 1.1.0"
 
   s.add_development_dependency "rake"
   s.add_development_dependency "bundler"
