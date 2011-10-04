@@ -31,6 +31,21 @@ describe Redpear::Model do
     subject.update("a" => 1, :b => 2).should == { "a" => 1, "b" => 2 }
   end
 
+  it 'should be comparable' do
+    Post.new(:id => 1).should == Post.new(:id => 1)
+    Post.new(:id => 1).should == Post.new(:id => 1, :title => nil)
+    Post.new(:id => 1, :title => "A").should_not == Post.new(:id => 1, :title => "B")
+    Post.new(:id => 2).should_not == Post.new(:id => 1)
+
+    Post.new.should == Post.new
+    Post.new.should_not == Post.new(:title => "A")
+
+    Post.new.should_not == Comment.new
+    Post.new(:id => 1).should_not == Comment.new(:id => 1)
+
+    [Post.new(:id => 1), Post.new(:id => 2)].should =~ [Post.new(:id => 2), Post.new(:id => 1)]
+  end
+
   it 'should allow to fetch attributes without type-casting' do
     subject._fetch('votes').should == nil
     subject['votes'].should == 0

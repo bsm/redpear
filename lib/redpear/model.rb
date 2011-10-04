@@ -30,6 +30,16 @@ class Redpear::Model < Hash
   end
   alias_method :load, :update
 
+  # Custom comparator
+  def ==(other)
+    case other
+    when Redpear::Model
+      other.instance_of?(self.class) && to_hash(true) == other.to_hash(true)
+    else
+      super
+    end
+  end
+
   # Attribute reader with type-casting
   def [](name)
     name = name.to_s
@@ -49,8 +59,9 @@ class Redpear::Model < Hash
   end
 
   # Returns a Hash with attributes
-  def to_hash
-    {}.update(self)
+  def to_hash(clean = false)
+    attrs = clean ? reject {|_, v| v.nil? } : self
+    {}.update(attrs)
   end
 
   # Show information about this record
