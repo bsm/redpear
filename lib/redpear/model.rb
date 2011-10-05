@@ -14,7 +14,7 @@ class Redpear::Model < Hash
 
   def initialize(attrs = {})
     super()
-    @_casted = Set.new
+    @_attribute_cache = {}
     update(attrs)
   end
 
@@ -43,18 +43,17 @@ class Redpear::Model < Hash
   # Attribute reader with type-casting
   def [](name)
     name = name.to_s
-    return super if @_casted.include?(name)
-
-    @_casted << name
-    column = self.class.columns.lookup[name]
-    value  = super(name)
-    store name, column ? column.type_cast(value) : value
+    @_attribute_cache[name] ||= begin
+      column = self.class.columns.lookup[name]
+      value  = super(name)
+      column ? column.type_cast(value) : value
+    end
   end
 
   # Attribute writer
   def []=(name, value)
     name = name.to_s
-    @_casted.delete(name)
+    @_attribute_cache.delete(name)
     super
   end
 

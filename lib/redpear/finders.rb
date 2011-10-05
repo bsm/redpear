@@ -15,7 +15,7 @@ module Redpear::Finders
 
     # Returns all records
     def all
-      members.map {|id| find(id) }
+      members.map {|id| new('id' => id.to_s) }
     end
 
     # Find one record

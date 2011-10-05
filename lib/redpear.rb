@@ -1,4 +1,5 @@
 require "nest"
+require "redis"
 
 module Redpear
 
