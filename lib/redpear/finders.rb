@@ -3,22 +3,25 @@ module Redpear::Finders
 
   module ClassMethods
 
-    # Returns all IDs of exiting records
+    # @return [Array] the IDs of all existing records
     def members
       mb_nest.smembers
     end
 
-    # Returns the number of total records
+    # @return [Integer] the number of total records
     def count
       members.size
     end
 
-    # Returns all records
+    # @return [Array] all records
     def all
-      members.map {|id| new('id' => id.to_s) }
+      members.map {|id| find(id) }
     end
 
-    # Find one record
+    # Finds a single record.
+    #
+    # @param id the ID of the record to retrieve
+    # @return [Redpear::Model] a record, or nil when not found
     def find(id)
       return nil unless exists?(id) # Skip if ID is not a member of mb_nest
       record = new('id' => id.to_s) # Initialize
@@ -32,6 +35,8 @@ module Redpear::Finders
       end
     end
 
+    # @param id the ID to check
+    # @return [Boolean] true or false
     def exists?(id)
       mb_nest.sismember(id)
     end

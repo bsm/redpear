@@ -1,6 +1,7 @@
 module Redpear::Expiration
 
-  # Expire this record. Expects either a Time or an Integer period.
+  # Expires the record.
+  # @param [Time, Integer] either a Time or an Integer period (in seconds)
   def expire(value)
     return false unless persisted?
 
@@ -17,7 +18,8 @@ module Redpear::Expiration
     end
   end
 
-  # How long does this record have to live?
+  # @return [Integer] the period this record has to live.
+  # May return -1 for non-expiring records and nil for non-persisted records.
   def ttl
     nest.ttl if persisted?
   end

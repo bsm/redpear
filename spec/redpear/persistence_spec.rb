@@ -83,7 +83,9 @@ describe Redpear::Persistence do
     end
 
     it 'should allow to pass a custom block into the save transaction' do
-      subject.save { expire(3600) }
+      subject.save do |record|
+        record.expire(3600)
+      end
       subject.ttl.should > 0
       subject.ttl.should <= 3600
     end

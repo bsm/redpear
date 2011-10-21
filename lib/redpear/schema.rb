@@ -4,25 +4,28 @@ module Redpear::Schema
 
   module ClassMethods
 
+    # @return [Redpear::Schema::Collection] the columns of this model
     def columns
       @columns ||= Redpear::Schema::Collection.new
     end
 
+    # @param [multiple] the column definition. Please see Redpear::Column#initialize
     def column(*args)
       columns.column(self, *args).tap do |col|
-        define_attribute_accessors(col)
+        __define_attribute_accessors__(col)
       end
     end
 
+    # @param [multiple] the index definition. Please see Redpear::Column#initialize
     def index(*args)
       columns.index(self, *args).tap do |col|
-        define_attribute_accessors(col)
+        __define_attribute_accessors__(col)
       end
     end
 
     private
 
-      def define_attribute_accessors(col)
+      def __define_attribute_accessors__(col)
         define_method(col.name) { self[col.name] } if col.readable?
         define_method("#{col.name}=") {|v| self[col.name] = v } if col.writable?
       end

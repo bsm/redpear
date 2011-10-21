@@ -4,6 +4,7 @@ require 'rubygems'
 require 'benchmark'
 require 'ohm'
 require 'redpear'
+require 'redis/connection/hiredis'
 
 Ohm.redis = Redis.current
 Redpear::Model.connection = Redis.current

@@ -1,12 +1,21 @@
 class Redpear::Column < String
   attr_reader :type, :model
 
-  def initialize(model, value, type = nil)
-    super value.to_s
+  # Creates a new column.
+  # @param [Redpear::Model] model the model the column is associated with
+  # @param [String] name the column name
+  # @param [Symbol] type the column type (:string (default), :counter, :integer, :timestamp)
+  def initialize(model, name, type = nil)
+    super name.to_s
     @model = model
     @type  = type.to_sym if type
   end
 
+  # Casts a value to a type
+  #
+  # @param value the value to cast
+  # @param [Symbol, #optional] type the type to cast to, defaults to the column type
+  # @return the casted value
   def type_cast(value, type = self.type)
     case type
     when :counter
@@ -21,18 +30,22 @@ class Redpear::Column < String
     end
   end
 
+  # @return [String] the column name
   def name
     to_s
   end
 
+  # @return [Boolean] true if the column is readable
   def readable?
     true
   end
 
+  # @return [Boolean] true if the column is writable
   def writable?
     type != :counter
   end
 
+  # @return [Boolean] true if the column is an index
   def index?
     is_a? Redpear::Index
   end
