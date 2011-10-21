@@ -2,13 +2,11 @@
 
 A simple, elegant & efficient ORM for Redis, optimised for speed!
 
-== Introduction
-
 Redis is a simple key/value store, hence storing structured data can be a
 challenge. Redpear allows you to store/find/associate "records" in a Redis DB
 very efficiently, minimising IO operations and storage space where possible.
 
-For example:
+== Examples
 
   class Post < Redpear::Model
     column :title
@@ -25,10 +23,31 @@ Let's create a post and a comment:
   post = Post.create :title => "Hi!", :body => "I'm a new post"
   comment = Comment.create :post_id => post.id, :body => "I like this!"
 
-Redpear is VERY lightweight. Compared with other ORMs, it offers raw speed at
-the expense of convenience.
+Now let's find and update a Comment:
+
+  comment = Comment.find 123
+  comment.body = "This is fun!"
+  comment.save
+
+== Installation
+
+You should be familiar with http://gembundler.com/. Simply include redpear in
+your Gemfile:
+
+  gem "redpear"
+
+You can additionally include the hiredis extension (written in C), you you
+want to make use of it:
+
+  gem "hiredis", "~> 0.3.1"
+  gem "redis", "~> 2.2.0", :require => ["redis/connection/hiredis", "redis"]
+
+Please see https://github.com/pietern/hiredis-rb for more details.
 
 == Highlights
+
+Redpear is VERY lightweight. Compared with other ORMs, it offers raw speed at
+the expense of convenience.
 
 * Uses the latest Redis features
 * Minimises number of IO operations

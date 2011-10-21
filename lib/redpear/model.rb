@@ -20,8 +20,8 @@ For example:
 
 Let's create a post and a comment:
 
-  post = Post.create :title => "Hi!", :body => "I'm a new post"
-  comment = Comment.create :post_id => post.id, :body => "I like this!"
+  post = Post.save :title => "Hi!", :body => "I'm a new post"
+  comment = Comment.save :post_id => post.id, :body => "I like this!"
 
 Redpear is VERY lightweight. Compared with other ORMs, it offers raw speed at
 the expense of convenience.

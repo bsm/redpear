@@ -4,7 +4,7 @@ require 'rubygems'
 require 'benchmark'
 require 'ohm'
 require 'redpear'
-require 'redis/connection/hiredis'
+# require 'redis/connection/hiredis'
 
 COUNT     = 2000
 Ohm.redis = Redis.current
