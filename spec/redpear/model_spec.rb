@@ -9,7 +9,7 @@ describe Redpear::Model do
   it { should be_a(Hash) }
 
   it 'should initialize with attributes' do
-    described_class.new(:id => 1).should == { "id" => 1 }
+    described_class.new(:id => 1).should == { "id" => "1" }
   end
 
   it 'should have an ID' do
@@ -28,7 +28,8 @@ describe Redpear::Model do
   end
 
   it 'should allow bulk updates' do
-    subject.update("a" => 1, :b => 2).should == { "a" => 1, "b" => 2 }
+    subject.update("a" => 1, :b => 2, :id => 3).should == { "a" => 1, "b" => 2, "id" => "3" }
+    subject.update(nil).should == { "a" => 1, "b" => 2, "id" => "3" }
   end
 
   it 'should be comparable' do
@@ -47,19 +48,19 @@ describe Redpear::Model do
   end
 
   it 'should allow to fetch attributes without type-casting' do
-    subject._fetch('votes').should == nil
+    subject.__fetch__('votes').should == nil
     subject['votes'].should == 0
   end
 
   it 'should read attributes with type-casting' do
-    subject._fetch('votes').should == nil
+    subject.__fetch__('votes').should == nil
     subject['votes'].should == 0
     subject.votes.should == 0
   end
 
   it 'should write attributes correctly' do
     subject[:title] = "A"
-    subject._fetch("title").should == "A"
+    subject.__fetch__("title").should == "A"
 
     subject['votes'].should == 0
     subject['votes'] = "1"

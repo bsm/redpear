@@ -21,14 +21,14 @@ module Redpear::Finders
     # Finds a single record.
     #
     # @param id the ID of the record to retrieve
+    # @param [Hash] options additional options
+    # @option :lazy defaults to true, set to false to load the record instantly
     # @return [Redpear::Model] a record, or nil when not found
-    def find(id)
-      return nil unless exists?(id) # Skip if ID is not a member of mb_nest
-      record = new('id' => id.to_s) # Initialize
-
+    def find(id, options = {})
+      record = instantiate('id' => id.to_s) # Initialize
       if record.nest.exists         # Do we have a record key?
-        pairs = record.nest.mapped_hmget *columns.names
-        record.update pairs
+        record.refresh_attributes if options[:lazy] == false
+        record
       else                          # Must be an expired or orphaned one
         record.destroy              # Destroy (removes from mb_nest set)
         nil
@@ -39,6 +39,12 @@ module Redpear::Finders
     # @return [Boolean] true or false
     def exists?(id)
       mb_nest.sismember(id)
+    end
+
+    def instantiate(*a)
+      new(*a).tap do |instance|
+        instance.send :instance_variable_set, :@__loaded__, false
+      end
     end
 
   end

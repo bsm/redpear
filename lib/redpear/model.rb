@@ -35,25 +35,20 @@ class Redpear::Model < Hash
   include Redpear::Finders
 
   # Ensure we can read raw level values
-  alias_method :_fetch, :[]
+  alias_method :__fetch__, :[]
 
   def initialize(attrs = {})
     super()
-    @_attribute_cache = {}
+    @__attributes__ = {}
+    @__loaded__     = true
     update(attrs)
   end
 
   # Every record needs an ID
   def id
-    value = _fetch("id")
+    value = __fetch__("id")
     value.to_s if value
   end
-
-  # Bulk-update attributes
-  def update(attrs)
-    super attrs.stringify_keys
-  end
-  alias_method :load, :update
 
   # Custom comparator
   def ==(other)
@@ -67,8 +62,9 @@ class Redpear::Model < Hash
 
   # Attribute reader with type-casting
   def [](name)
+    __ensure_loaded__
     name = name.to_s
-    @_attribute_cache[name] ||= begin
+    @__attributes__[name] ||= begin
       column = self.class.columns.lookup[name]
       value  = super(name)
       column ? column.type_cast(value) : value
@@ -77,20 +73,37 @@ class Redpear::Model < Hash
 
   # Attribute writer
   def []=(name, value)
+    __ensure_loaded__
     name = name.to_s
-    @_attribute_cache.delete(name)
+    @__attributes__.delete(name)
     super
   end
 
   # Returns a Hash with attributes
   def to_hash(clean = false)
+    __ensure_loaded__
     attrs = clean ? reject {|_, v| v.nil? } : self
     {}.update(attrs)
   end
 
   # Show information about this record
   def inspect
+    __ensure_loaded__
     "#<#{self.class.name} #{super}>"
   end
+
+  # Bulk-update attributes
+  def update(attrs)
+    attrs = (attrs ? attrs.stringify_keys : {})
+    attrs["id"] = attrs["id"].to_s if attrs["id"]
+    super
+  end
+  alias_method :load, :update
+
+  private
+
+    def __ensure_loaded__
+      refresh_attributes unless @__loaded__
+    end
 
 end

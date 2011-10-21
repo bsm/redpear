@@ -15,7 +15,7 @@ describe Redpear::Persistence do
   end
 
   subject do
-    Post.new :id => 123, :title => 'B', :created_at => Time.at(1313131313)
+    Post.new :id => "123", :title => 'B', :created_at => Time.at(1313131313)
   end
 
   describe "new records" do
@@ -33,6 +33,12 @@ describe Redpear::Persistence do
     subject.save
     subject.update "name" => "C"
     subject.tap(&:reload).should == { "id" => "123", "title" => "B", "votes" => nil, "body" => nil, "created_at" => "1313131313" }
+  end
+
+  it 'should refresh record attributes' do
+    subject.save
+    subject.update "name" => "C", "title" => "Z"
+    subject.tap(&:refresh_attributes).should == { "id" => "123", "title" => "B", "name" => "C", "votes" => nil, "body" => nil, "created_at" => "1313131313" }
   end
 
   describe "saving" do

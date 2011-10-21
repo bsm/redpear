@@ -43,9 +43,16 @@ module Redpear::Persistence
     !new_record?
   end
 
-  # Reload the record (destructive)
+  # Reloads the record (destructive)
   def reload
-    replace self.class.find(id) if persisted?
+    replace self.class.find(id, :lazy => false) if persisted?
+    self
+  end
+
+  # Load attributes from DB (destructive)
+  def refresh_attributes
+    update nest.mapped_hmget(*self.class.columns.names) if persisted?
+    @__loaded__ = true
     self
   end
 

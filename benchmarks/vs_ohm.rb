@@ -6,6 +6,7 @@ require 'ohm'
 require 'redpear'
 require 'redis/connection/hiredis'
 
+COUNT     = 2000
 Ohm.redis = Redis.current
 Redpear::Model.connection = Redis.current
 
@@ -30,45 +31,45 @@ Redis.current.flushall
 Benchmark.bm(20) do |x|
 
   x.report "Create: Ohm" do
-    1000.times { Apple.create :name => "Gala", :year => 2011 }
+    COUNT.times {|i| Apple.create :name => "Gala", :year => 2011, :id => i }
   end
 
   x.report "Create: Redpear" do
-    1000.times { Pear.save :name => "Gala", :year => 2011 }
+    COUNT.times {|i| Pear.save :name => "Gala", :year => 2011, :id => i }
   end
 
   x.report "Find all: Ohm" do
-    20.times { Apple.all.to_a.size }
+    10.times { Apple.all.to_a.size }
   end
 
   x.report "Find all: Redpear" do
-    20.times { Pear.all.to_a.size }
+    10.times { Pear.all.to_a.size }
   end
 
   x.report "Inspect all: Ohm" do
-    10.times { Apple.all.map(&:inspect) }
+    5.times { Apple.all.map(&:inspect) }
   end
 
   x.report "Inspect all: Redpear" do
-    10.times { Pear.all.map(&:inspect) }
+    5.times { Pear.all.map(&:inspect) }
   end
 
   x.report "Find one: Ohm" do
-    one_id = Apple.all.key.smembers.first
-    1000.times { Apple[one_id].inspect }
+    4000.times { Apple[rand(COUNT)].inspect }
   end
 
   x.report "Find one: Redpear" do
-    one_id = Pear.members.first
-    1000.times { Pear.find(one_id).inspect }
+    4000.times { Pear.find(rand(COUNT)).inspect }
   end
 
+  apples = Apple.all
   x.report "Destroy: Ohm" do
-    assert_cycles 1000, Apple.all.each(&:delete).size
+    assert_cycles COUNT, apples.each(&:delete).size
   end
 
+  pears  = Pear.all
   x.report "Destroy: Redpear" do
-    assert_cycles 1000, Pear.all.each(&:destroy).size
+    assert_cycles COUNT, pears.each(&:destroy).size
   end
 
 end

@@ -29,8 +29,14 @@ describe Redpear::Finders do
 
   it 'should find individual records' do
     subject.class.find(1).should be_a(Post)
-    subject.class.find(1).should == { "id" => "1", "title" => "A", "body" => "B", "votes" => nil, "created_at" => nil }
+    subject.class.find(1).should == { "id" => "1" }
+    subject.class.find(1).to_hash.should == { "id" => "1", "title" => "A", "body" => "B", "votes" => nil, "created_at" => nil }
     subject.class.find(100).should be_nil
+  end
+
+  it 'should find individual records (and load instanly)' do
+    subject.class.find(1, :lazy => false).should be_a(Post)
+    subject.class.find(1, :lazy => false).should == { "id" => "1", "title" => "A", "body" => "B", "votes" => nil, "created_at" => nil }
   end
 
   it 'should not find expired records' do
