@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.name        = "redpear"
   s.summary     = "Redpear, a Redis ORM"
   s.description = "Simple, elegant & efficient ORM for Redis"
-  s.version     = "0.3.0"
+  s.version     = "0.3.1"
 
   s.authors     = ["Dimitrij Denissenko"]
   s.email       = "dimitrij@blacksquaremedia.com"

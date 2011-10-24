@@ -1,3 +1,4 @@
+require 'redpear'
 require 'machinist'
 
 # Machinist module for your tests/specs. Example:
