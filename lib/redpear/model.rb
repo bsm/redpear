@@ -44,13 +44,21 @@ class Redpear::Model < Hash
     update(attrs)
   end
 
-  # Every record needs an ID
+  # Returns the ID of the record
+  # @return [String]
   def id
     value = __fetch__("id")
     value.to_s if value
   end
 
+  # ID accessor
+  # @param [Object] id
+  def id=(value)
+    self["id"] = value.to_s
+  end
+
   # Custom comparator
+  # @return [Boolean]
   def ==(other)
     case other
     when Redpear::Model
@@ -61,6 +69,7 @@ class Redpear::Model < Hash
   end
 
   # Attribute reader with type-casting
+  # @return [Object]
   def [](name)
     __ensure_loaded__
     name = name.to_s
@@ -72,6 +81,8 @@ class Redpear::Model < Hash
   end
 
   # Attribute writer
+  # @param [String] name
+  # @param [Object] value
   def []=(name, value)
     __ensure_loaded__
     name = name.to_s
@@ -80,6 +91,9 @@ class Redpear::Model < Hash
   end
 
   # Returns a Hash with attributes
+  # @param [Boolean] clean
+  #   If true, only actual values will be returned (without nils), defaults to false
+  # @return [Hash]
   def to_hash(clean = false)
     __ensure_loaded__
     attrs = clean ? reject {|_, v| v.nil? } : self
@@ -87,12 +101,14 @@ class Redpear::Model < Hash
   end
 
   # Show information about this record
+  # @return [String]
   def inspect
     __ensure_loaded__
     "#<#{self.class.name} #{super}>"
   end
 
   # Bulk-update attributes
+  # @param [Hash] attrs
   def update(attrs)
     attrs = (attrs ? attrs.stringify_keys : {})
     attrs["id"] = attrs["id"].to_s if attrs["id"]

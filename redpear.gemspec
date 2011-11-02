@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.name        = "redpear"
   s.summary     = "Redpear, a Redis ORM"
   s.description = "Simple, elegant & efficient ORM for Redis"
-  s.version     = "0.3.1"
+  s.version     = "0.3.3"
 
   s.authors     = ["Dimitrij Denissenko"]
   s.email       = "dimitrij@blacksquaremedia.com"
@@ -25,5 +25,4 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec"
   s.add_development_dependency "fakeredis"
   s.add_development_dependency "shoulda-matchers"
-  s.add_development_dependency "machinist", '~> 2.0.0.beta'
 end

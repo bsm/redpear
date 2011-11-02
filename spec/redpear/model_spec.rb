@@ -17,6 +17,11 @@ describe Redpear::Model do
     subject.update("id" => 123).id.should == '123'
   end
 
+  it 'should allow to assign an ID' do
+    subject.id = 123
+    subject.id.should == '123'
+  end
+
   it 'should be exportable to a real hash' do
     subject.to_hash.should == subject
     subject.to_hash.should be_instance_of(Hash)

@@ -18,6 +18,7 @@ module Redpear::Persistence
     def save(*args)
       new(*args).tap(&:save)
     end
+    alias_method :save!, :save
 
     # Destroys a record. Example:
     # @param id the ID of the record to destroy
@@ -75,6 +76,7 @@ module Redpear::Persistence
   ensure
     after_save
   end
+  alias_method :save!, :save
 
   # Destroy the record.
   # @return [Boolean] true or false

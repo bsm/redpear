@@ -59,6 +59,10 @@ describe Redpear::Persistence do
       subject.nest.mapped_hmget_all.should == { 'title' => 'B', "created_at" => "1313131313" }
     end
 
+    it 'should save with a bang' do
+      subject.save!.should == subject
+    end
+
     it 'should save "blank" instances' do
       lambda {
         blank_instance.save.should == blank_instance
