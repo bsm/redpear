@@ -31,6 +31,7 @@ class Redpear::Model < Hash
   include Redpear::Namespace
   include Redpear::Persistence
   include Redpear::Expiration
+  include Redpear::Counters
   include Redpear::Schema
   include Redpear::Finders
 

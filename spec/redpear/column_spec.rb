@@ -45,7 +45,7 @@ describe Redpear::Column do
   it 'should determine writable status' do
     subject.should be_writable
     integer.should be_writable
-    counter.should_not be_writable
+    counter.should be_writable
     timestamp.should be_writable
   end
 

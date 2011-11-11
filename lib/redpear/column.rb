@@ -42,7 +42,7 @@ class Redpear::Column < String
 
   # @return [Boolean] true if the column is writable
   def writable?
-    type != :counter
+    true
   end
 
   # @return [Boolean] true if the column is an index

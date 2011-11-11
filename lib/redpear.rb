@@ -11,6 +11,7 @@ module Redpear
   autoload :Column
   autoload :Concern
   autoload :Connection
+  autoload :Counters
   autoload :Expiration
   autoload :Finders
   autoload :Index

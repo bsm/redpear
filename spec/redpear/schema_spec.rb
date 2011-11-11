@@ -42,11 +42,11 @@ describe Redpear::Schema do
     comment.post_id.should be_nil
 
     post.title = "A"
-    post.should_not respond_to(:votes=)
+    post.votes = 500
     comment.post_id = 123
 
     post.title.should == "A"
-    post.votes.should == 0
+    post.votes.should == 500
     comment.post_id.should == 123
   end
 
