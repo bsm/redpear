@@ -3,12 +3,12 @@
 Gem::Specification.new do |s|
   s.platform = Gem::Platform::RUBY
   s.required_ruby_version = '>= 1.8.7'
-  s.required_rubygems_version = ">= 1.6.0"
+  s.required_rubygems_version = ">= 1.3.6"
 
   s.name        = "redpear"
   s.summary     = "Redpear, a Redis ORM"
   s.description = "Simple, elegant & efficient ORM for Redis"
-  s.version     = "0.3.5"
+  s.version     = "0.3.6"
 
   s.authors     = ["Dimitrij Denissenko"]
   s.email       = "dimitrij@blacksquaremedia.com"
