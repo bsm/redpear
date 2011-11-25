@@ -15,7 +15,7 @@ describe Redpear::Finders do
   it { subject.should be_a(described_class) }
 
   it 'should retrieve members' do
-    subject.class.members.should be_a(Redpear::Set)
+    subject.class.members.should be_a(Redpear::Members)
     subject.class.members.to_a.should =~ ["1", "2", "3"]
   end
 

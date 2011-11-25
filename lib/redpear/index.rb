@@ -25,7 +25,7 @@ class Redpear::Index < Redpear::Column
   # @param [String] value the index value
   # @return [Array] the IDs of all existing records for a given index value
   def members(value)
-    Redpear::Set.new nest(value)
+    Redpear::Members.new nest(value)
   end
 
 end

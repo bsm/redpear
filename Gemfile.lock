@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    redpear (0.3.5)
+    redpear (0.4.0)
       nest (~> 1.1.0)
       redis (~> 2.2.0)
 

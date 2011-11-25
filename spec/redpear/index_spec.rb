@@ -24,7 +24,7 @@ describe Redpear::Index do
     subject.members(123).should == []
     subject.nest(123).sadd 1
     subject.members(123).should == ["1"]
-    subject.members(123).should be_a(Redpear::Set)
+    subject.members(123).should be_a(Redpear::Members)
   end
 
 end

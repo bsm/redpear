@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Redpear::Set do
+describe Redpear::Members do
 
   let :nest do
     n = Redpear::Nest.new "random", connection

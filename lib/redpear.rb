@@ -15,11 +15,11 @@ module Redpear
   autoload :Expiration
   autoload :Finders
   autoload :Index
+  autoload :Members
   autoload :Model
   autoload :Namespace
   autoload :Nest
   autoload :Persistence
   autoload :Schema
-  autoload :Set
 
 end

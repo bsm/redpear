@@ -115,7 +115,6 @@ class Redpear::Model < Hash
     attrs["id"] = attrs["id"].to_s if attrs["id"]
     super
   end
-  alias_method :load, :update
 
   private
 

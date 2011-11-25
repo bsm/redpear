@@ -5,7 +5,7 @@ module Redpear::Finders
 
     # @return [Array] the IDs of all existing records
     def members
-      Redpear::Set.new(mb_nest)
+      Redpear::Members.new(mb_nest)
     end
 
     # @return [Integer] the number of total records

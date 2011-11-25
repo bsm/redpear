@@ -82,6 +82,7 @@ module Redpear::Persistence
   # @return [Boolean] true or false
   def destroy
     return false unless persisted?
+    before_destroy
 
     transaction do
       nest.del
@@ -89,6 +90,8 @@ module Redpear::Persistence
     end
 
     true
+  ensure
+    after_destroy
   end
 
   protected
@@ -105,6 +108,14 @@ module Redpear::Persistence
 
     # "Cheap" callback, override in subclasses
     def after_save
+    end
+
+    # "Cheap" callback, override in subclasses
+    def before_destroy
+    end
+
+    # "Cheap" callback, override in subclasses
+    def after_destroy
     end
 
   private

@@ -1,4 +1,4 @@
-class Redpear::Set
+class Redpear::Members
   include Enumerable
 
   def initialize(nest)
