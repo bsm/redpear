@@ -18,6 +18,11 @@ module Redpear::Finders
       members.map {|id| find(id) }
     end
 
+    # @yield [Model] applies a block to each object
+    def find_each(&block)
+      members.each {|id| yield find(id) }
+    end
+
     # Finds a single record.
     #
     # @param id the ID of the record to retrieve

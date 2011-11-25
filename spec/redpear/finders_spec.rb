@@ -28,6 +28,14 @@ describe Redpear::Finders do
     subject.class.all.first.should be_a(Post)
   end
 
+  it 'should find each record' do
+    res = []
+    subject.class.find_each do |record|
+      res << record.id
+    end
+    res.should =~ ["1", "2", "3"]
+  end
+
   it 'should find individual records' do
     subject.class.find(1).should be_a(Post)
     subject.class.find(1).should == { "id" => "1" }
