@@ -20,5 +20,6 @@ module Redpear
   autoload :Nest
   autoload :Persistence
   autoload :Schema
+  autoload :Set
 
 end

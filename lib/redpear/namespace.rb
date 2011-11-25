@@ -13,11 +13,11 @@
 #   instance.nest.mapped_hmget_all # => { "post_id" => "2" }
 #
 #   # Member nesting
-#   Comment.mb_nest               # "comments:*"
+#   Comment.mb_nest               # "comments:[~]"
 #   Comment.mb_nest.smembers      # => #<Set: {1}>
 #
 #   # PK nesting
-#   Comment.pk_nest               # "comments:+"
+#   Comment.pk_nest               # "comments:[+]"
 #   Comment.pk_nest.get           # 1 = last ID
 #
 #   # Index nesting
@@ -52,7 +52,7 @@ module Redpear::Namespace
     #   Comment.mb_nest.smembers # => [1, 2, 3]
     #
     def mb_nest
-      @mb_nest ||= namespace["*"]
+      @mb_nest ||= namespace["[~]"]
     end
 
     # @return [Redpear::Nest] the nest for the primary-key incrementor. Example:
@@ -62,7 +62,7 @@ module Redpear::Namespace
     #   Comment.pk_nest.incr # => 1
     #
     def pk_nest
-      @pk_nest ||= namespace["+"]
+      @pk_nest ||= namespace["[+]"]
     end
 
   end

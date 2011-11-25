@@ -5,12 +5,12 @@ module Redpear::Finders
 
     # @return [Array] the IDs of all existing records
     def members
-      mb_nest.smembers
+      Redpear::Set.new(mb_nest)
     end
 
     # @return [Integer] the number of total records
     def count
-      members.size
+      members.count
     end
 
     # @return [Array] all records
@@ -38,7 +38,7 @@ module Redpear::Finders
     # @param id the ID to check
     # @return [Boolean] true or false
     def exists?(id)
-      mb_nest.sismember(id)
+      members.exists?(id)
     end
 
     def instantiate(*a)

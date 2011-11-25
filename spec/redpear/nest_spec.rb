@@ -8,7 +8,7 @@ describe Redpear::Nest do
 
   it  { should be_a(::Nest) }
 
-  it "should readl/write hashes" do
+  it "should read/write hashes" do
     subject.mapped_hmset :a => 1, :b => 'x'
     subject.mapped_hmget('a').should == { 'a' => '1' }
   end

@@ -47,7 +47,7 @@ describe Redpear::Persistence do
       lambda {
         new_instance.save
       }.should change {
-        connection.get('posts:+')
+        connection.get('posts:[+]')
       }.from(nil).to("1")
       new_instance.nest.should == "posts:1"
     end
@@ -72,18 +72,18 @@ describe Redpear::Persistence do
     it 'should store the ID in the members index' do
       lambda {
         subject.save
-      }.should change { subject.class.members }.from([]).to(['123'])
+      }.should change { subject.class.members.to_a }.from([]).to(['123'])
     end
 
     it 'should store the ID in column indexes' do
       indexable_instance.save
-      connection.keys.should =~ ["comments:123", "comments:*", "comments:post_id:456"]
-      connection.get('comments:post_id:456').should == ['123'].to_set
+      connection.keys.should =~ ["comments:123", "comments:[~]", "comments:[post_id]:456"]
+      connection.get('comments:[post_id]:456').should == ['123'].to_set
     end
 
     it 'should NOT store the ID in column indexes if column value is empty' do
       subject.save
-      connection.keys.should =~ ["posts:123", "posts:*"]
+      connection.keys.should =~ ["posts:123", "posts:[~]"]
     end
 
     it 'should allow to expire on save' do
@@ -104,7 +104,7 @@ describe Redpear::Persistence do
       saved = nil
       lambda {
         saved = Post.save :name => 'A', :id => 1234
-      }.should change { subject.class.members }.from([]).to(['1234'])
+      }.should change { subject.class.members.to_a }.from([]).to(['1234'])
 
       saved.should be_a(Post)
       saved.nest.should == "posts:1234"
@@ -132,21 +132,21 @@ describe Redpear::Persistence do
     it 'should remove ID from the members index' do
       lambda {
         subject.destroy
-      }.should change { subject.class.members }.from(['123']).to([])
+      }.should change { subject.class.members.to_a }.from(['123']).to([])
     end
 
     it 'should remove ID from column indices' do
       indexable_instance.save
-      connection.get('comments:post_id:456').should have(1).item
+      connection.get('comments:[post_id]:456').should have(1).item
 
       indexable_instance.destroy
-      connection.get('comments:post_id:456').should be_empty
+      connection.get('comments:[post_id]:456').should be_empty
     end
 
     it 'should allow shortcut-destroy records' do
       lambda {
         Post.destroy(subject.id)
-      }.should change { subject.class.members }.from(['123']).to([])
+      }.should change { subject.class.members.to_a }.from(['123']).to([])
     end
 
   end
