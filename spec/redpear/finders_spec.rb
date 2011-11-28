@@ -24,16 +24,18 @@ describe Redpear::Finders do
   end
 
   it 'should retrieve all records' do
-    subject.class.all.should have(3).items
+    Post.find(3).expire(Time.now)
+    subject.class.all.should have(2).items
     subject.class.all.first.should be_a(Post)
   end
 
   it 'should find each record' do
+    Post.find(3).expire(Time.now)
     res = []
     subject.class.find_each do |record|
       res << record.id
     end
-    res.should =~ ["1", "2", "3"]
+    res.should =~ ["1", "2"]
   end
 
   it 'should find individual records' do

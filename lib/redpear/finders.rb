@@ -15,12 +15,15 @@ module Redpear::Finders
 
     # @return [Array] all records
     def all
-      members.map {|id| find(id) }
+      members.map {|id| find(id) }.compact
     end
 
     # @yield [Model] applies a block to each object
     def find_each(&block)
-      members.each {|id| yield find(id) }
+      members.each do |id|
+        record = find(id)
+        yield(record) if record
+      end
     end
 
     # Finds a single record.
