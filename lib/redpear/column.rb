@@ -2,9 +2,12 @@ class Redpear::Column < String
   attr_reader :type, :model
 
   # Creates a new column.
-  # @param [Redpear::Model] model the model the column is associated with
-  # @param [String] name the column name
-  # @param [Symbol] type the column type (:string (default), :counter, :integer, :timestamp)
+  # @param [Redpear::Model] model
+  #   the model the column is associated with
+  # @param [String] name
+  #   the column name
+  # @param [Symbol] type
+  #   the column type (:string (default), :counter, :integer, :timestamp)
   def initialize(model, name, type = nil)
     super name.to_s
     @model = model

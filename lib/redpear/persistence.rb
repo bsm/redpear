@@ -69,7 +69,7 @@ module Redpear::Persistence
 
     transaction do
       nest.mapped_hmset __persistable_attributes__
-      __relevant_member_sets__.each {|s| s.add(id) }
+      __relevant_member_sets__.each {|s| s.add(self) }
       expire options[:expire]
       yield(self) if block
     end
@@ -86,7 +86,7 @@ module Redpear::Persistence
 
     transaction do
       nest.del
-      __relevant_member_sets__.each {|s| s.remove(id) }
+      __relevant_member_sets__.each {|s| s.remove(self) }
     end
 
     true
@@ -146,7 +146,7 @@ module Redpear::Persistence
 
     # Return relevant set nests
     def __relevant_member_sets__
-      @__relevant_member_sets__ ||= [self.class.members] + self.class.columns.indices.map {|i| i.members(self[i]) }
+      @__relevant_member_sets__ ||= [self.class.members] + self.class.columns.indices.map {|i| i.members(self[i]) if self[i] }.compact
     end
 
 end

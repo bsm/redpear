@@ -40,7 +40,7 @@ describe Redpear::Schema do
 
   it 'should define/store sorted indices' do
     lambda {
-      subject.zindex "name"
+      subject.zindex "name", :id
     }.should change { subject.columns.dup }.from([]).to(["name"])
     subject.columns.first.should be_instance_of(Redpear::ZIndex)
   end

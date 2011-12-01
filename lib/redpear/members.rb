@@ -4,7 +4,8 @@ class Redpear::Members
   attr_reader :nest
 
   # Constructor
-  # @param [Redpear::Nest] the nest object
+  # @param [Redpear::Nest] nest
+  #   the nest object
   def initialize(nest)
     @nest = nest
   end
@@ -19,7 +20,8 @@ class Redpear::Members
     members.each(&block)
   end
 
-  # @param [String] value check if this value is a member
+  # @param [String] value
+  #   check if this value is a member
   # @return [Boolean] true if members contain the value
   def include?(value)
     loaded? ? @members.include?(value.to_s) : is_member?(value)
@@ -65,17 +67,17 @@ class Redpear::Members
   end
 
   # Add a member to this set
-  # @param [String] member
-  def add(member)
-    @members << member.to_s if loaded?
-    nest.sadd(member)
+  # @param [Model] record
+  def add(record)
+    @members << record.id if loaded?
+    nest.sadd(record.id)
   end
 
   # Remove a member from this set
-  # @param [String] member
-  def remove(member)
-    @members.delete(member.to_s) if loaded?
-    nest.srem(member)
+  # @param [Model] record
+  def remove(record)
+    @members.delete(record.id) if loaded?
+    nest.srem(record.id)
   end
 
 end

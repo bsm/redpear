@@ -1,5 +1,15 @@
 class Redpear::ZMembers < Redpear::Members
 
+  # Constructor
+  # @param [Redpear::Nest] nest
+  #   the nest object
+  # @param [Symbol] callback
+  #   the method to use for scoring when members are added
+  def initialize(nest, callback)
+    super(nest)
+    @callback = callback.to_sym
+  end
+
   # @return [Hash] the actual members
   def members
     @members ||= range.to_set
@@ -42,17 +52,17 @@ class Redpear::ZMembers < Redpear::Members
   end
 
   # Add a member to this set
-  # @param [String] member
-  def add(member, score = 0)
-    @members << member if loaded?
-    nest.zadd(score, member)
+  # @param [Model] record
+  def add(record)
+    @members << record.id if loaded?
+    nest.zadd(record.send(@callback), record.id)
   end
 
   # Remove a member from this set
-  # @param [String] member
-  def remove(member, score = 0)
-    @members.delete(member.to_s) if loaded?
-    nest.zrem(member)
+  # @param [Model] record
+  def remove(record, score = 0)
+    @members.delete(record.id) if loaded?
+    nest.zrem(record.id)
   end
 
 end

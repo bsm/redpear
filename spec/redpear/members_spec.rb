@@ -50,20 +50,20 @@ describe Redpear::Members do
   end
 
   it "should allow adding items" do
-    subject.add(3)
+    subject.add(Comment.new(:id => 3))
     subject.include?(3).should be(true)
 
     subject.to_a # load
-    subject.add(4)
+    subject.add(Comment.new(:id => 4))
     subject.include?(4).should be(true)
   end
 
   it "should allow removing items" do
-    subject.remove(2)
+    subject.remove(Comment.new(:id => 2))
     subject.include?(2).should be(false)
 
     subject.to_a # load
-    subject.remove(1)
+    subject.remove(Comment.new(:id => 1))
     subject.include?(1).should be(false)
   end
 

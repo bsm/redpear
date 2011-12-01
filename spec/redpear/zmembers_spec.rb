@@ -4,13 +4,13 @@ describe Redpear::ZMembers do
 
   let :nest do
     n = Redpear::Nest.new "random", connection
-    n.zadd 1, "A"
-    n.zadd 2, "B"
+    n.zadd 10, "A"
+    n.zadd 20, "B"
     n
   end
 
   subject do
-    described_class.new(nest)
+    described_class.new nest, :votes
   end
 
   it "should have members" do
@@ -23,7 +23,7 @@ describe Redpear::ZMembers do
 
   it "should return scores for values" do
     subject.score("C").should be_nil
-    subject.score("B").should == 2
+    subject.score("B").should == 20
   end
 
   it "should check if record exists" do
@@ -36,20 +36,22 @@ describe Redpear::ZMembers do
   end
 
   it "should allow adding items" do
-    subject.add("C")
+    subject.add(Post.new(:id => "C", :votes => 50))
     subject.include?("C").should be(true)
+    subject.score("C").should == 50
 
     subject.to_a # load
-    subject.add("D")
+    subject.add(Post.new(:id => "D", :votes => 60))
     subject.include?("D").should be(true)
+    subject.score("D").should == 60
   end
 
   it "should allow removing items" do
-    subject.remove("B")
+    subject.remove(Post.new(:id => "B"))
     subject.include?("B").should be(false)
 
     subject.to_a # load
-    subject.remove("A")
+    subject.remove(Post.new(:id => "A"))
     subject.include?("A").should be(false)
   end
 

@@ -32,13 +32,13 @@ describe Redpear::Persistence do
   it 'should reload records' do
     subject.save
     subject.update "name" => "C"
-    subject.tap(&:reload).should == { "id" => "123", "title" => "B", "votes" => nil, "body" => nil, "created_at" => "1313131313" }
+    subject.tap(&:reload).should == { "id" => "123", "title" => "B", "votes" => nil, "body" => nil, "created_at" => "1313131313", "user_id" => nil }
   end
 
   it 'should refresh record attributes' do
     subject.save
     subject.update "name" => "C", "title" => "Z"
-    subject.tap(&:refresh_attributes).should == { "id" => "123", "title" => "B", "name" => "C", "votes" => nil, "body" => nil, "created_at" => "1313131313" }
+    subject.tap(&:refresh_attributes).should == { "id" => "123", "title" => "B", "name" => "C", "votes" => nil, "body" => nil, "created_at" => "1313131313", "user_id" => nil }
   end
 
   describe "saving" do
