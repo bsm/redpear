@@ -14,11 +14,11 @@ class Redpear::Index < Redpear::Column
   #
   #   index = Comment.columns.lookup["post_id"]
   #   index.nest(123) # => "comments:[post_id]:123"
-  #   index.nest(nil) # => nil
-  #   index.nest("")  # => nil
+  #   index.nest(nil) # => "comments:[post_id]:_"
+  #   index.nest("")  # => "comments:[post_id]:_"
   #
   def nest(value)
-    return nil if value.nil? || (value.respond_to?(:empty?) && value.empty?)
+    value = "_" if value.nil? || (value.respond_to?(:empty?) && value.empty?)
     namespace[value]
   end
 

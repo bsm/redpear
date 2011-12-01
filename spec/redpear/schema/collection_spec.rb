@@ -4,43 +4,46 @@ describe Redpear::Schema::Collection do
 
   it { should be_a(Array) }
 
+  let :column do
+    subject.store Redpear::Column, Post, :title
+  end
+  alias_method :store_column, :column
+
   it 'should have a lookup' do
-    col = subject.column Post, :title
-    subject.lookup.should == { "title" => col }
+    store_column
+    subject.lookup.should == { "title" => column }
     subject.lookup.to_a.flatten.map(&:class).should == [String, Redpear::Column]
   end
 
   it 'should store columns' do
-    lambda { subject.column Post, :title }.should change { subject.size }.by(1)
+    lambda { store_column }.should change { subject.size }.by(1)
     subject.first.should be_instance_of(Redpear::Column)
   end
 
   it 'should store indices' do
-    lambda { subject.index Post, :foreign_id }.should change { subject.size }.by(1)
+    lambda { subject.store Redpear::Index, Post, :foreign_id }.should change { subject.size }.by(1)
     subject.first.should be_instance_of(Redpear::Index)
   end
 
   it 'should have names' do
-    subject.column Post, :title
+    store_column
     subject.first.should be_instance_of(Redpear::Column)
     subject.names.first.should be_instance_of(String)
   end
 
   it 'should allow Hash-style access' do
-    subject.column Post, :title
+    store_column
     subject[:title].should be_instance_of(Redpear::Column)
   end
 
   it 'should convert column names' do
-    lambda {
-      subject.column Post, :title
-    }.should change { subject.dup }.from([]).to(["title"])
+    lambda { store_column }.should change { subject.dup }.from([]).to(["title"])
   end
 
   it 'should scope indices' do
     subject.indices.should == []
-    subject.column Post, :title
-    subject.index  Post, :foreign_id
+    store_column
+    subject.store Redpear::Index,  Post, :foreign_id
     subject.should == ['title', 'foreign_id']
     subject.indices.should == ['foreign_id']
   end

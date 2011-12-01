@@ -28,12 +28,21 @@ describe Redpear::Schema do
     lambda {
       subject.column "name"
     }.should change { subject.columns.dup }.from([]).to(["name"])
+    subject.columns.first.should be_instance_of(Redpear::Column)
   end
 
   it 'should define/store indices' do
     lambda {
       subject.index "name"
     }.should change { subject.columns.dup }.from([]).to(["name"])
+    subject.columns.first.should be_instance_of(Redpear::Index)
+  end
+
+  it 'should define/store sorted indices' do
+    lambda {
+      subject.zindex "name"
+    }.should change { subject.columns.dup }.from([]).to(["name"])
+    subject.columns.first.should be_instance_of(Redpear::ZIndex)
   end
 
   it 'should create attribute accessor methods' do

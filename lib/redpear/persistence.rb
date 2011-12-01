@@ -52,7 +52,7 @@ module Redpear::Persistence
 
   # Load attributes from DB (destructive)
   def refresh_attributes
-    update nest.mapped_hmget(*self.class.columns.names) if persisted?
+    update nest.mapped_hmget(*__loadable_attributes__) if persisted?
     @__loaded__ = true
     self
   end
@@ -69,7 +69,7 @@ module Redpear::Persistence
 
     transaction do
       nest.mapped_hmset __persistable_attributes__
-      __relevant_sets__.each {|s| s.sadd(id) }
+      __relevant_member_sets__.each {|s| s.add(id) }
       expire options[:expire]
       yield(self) if block
     end
@@ -86,7 +86,7 @@ module Redpear::Persistence
 
     transaction do
       nest.del
-      __relevant_sets__.each {|s| s.srem(id) }
+      __relevant_member_sets__.each {|s| s.remove(id) }
     end
 
     true
@@ -118,7 +118,7 @@ module Redpear::Persistence
     def after_destroy
     end
 
-  private
+  protected
 
     # Attributes that can be persisted
     def __persistable_attributes__
@@ -128,6 +128,11 @@ module Redpear::Persistence
         result[key] = __persistable_value__(value)
       end
       result
+    end
+
+    # Attributes that can be loaded
+    def __loadable_attributes__
+      self.class.columns.names
     end
 
     def __persistable_value__(value)
@@ -140,8 +145,8 @@ module Redpear::Persistence
     end
 
     # Return relevant set nests
-    def __relevant_sets__
-      @__relevant_sets__ ||= [self.class.mb_nest] + self.class.columns.indices.map {|i| i.nest self[i] }.compact
+    def __relevant_member_sets__
+      @__relevant_member_sets__ ||= [self.class.members] + self.class.columns.indices.map {|i| i.members(self[i]) }
     end
 
 end

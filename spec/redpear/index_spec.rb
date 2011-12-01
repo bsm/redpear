@@ -14,8 +14,8 @@ describe Redpear::Index do
   end
 
   it 'should build nests by values' do
-    subject.nest(nil).should be_nil
-    subject.nest("").should be_nil
+    subject.nest(nil).should == "comments:[post_id]:_"
+    subject.nest("").should == "comments:[post_id]:_"
     subject.nest(123).should == "comments:[post_id]:123"
   end
 

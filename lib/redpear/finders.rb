@@ -46,7 +46,7 @@ module Redpear::Finders
     # @param id the ID to check
     # @return [Boolean] true or false
     def exists?(id)
-      members.exists?(id)
+      members.include?(id)
     end
 
     def instantiate(*a)

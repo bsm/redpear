@@ -21,5 +21,7 @@ module Redpear
   autoload :Nest
   autoload :Persistence
   autoload :Schema
+  autoload :ZIndex
+  autoload :ZMembers
 
 end

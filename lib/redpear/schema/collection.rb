@@ -2,17 +2,9 @@
 class Redpear::Schema::Collection < Array
 
   # @param [multiple] the column definition. Please see Redpear::Column#initialize
-  def column(*args)
+  def store(klass, *args)
     reset!
-    Redpear::Column.new(*args).tap do |col|
-      self << col
-    end
-  end
-
-  # @param [multiple] the index definition. Please see Redpear::Column#initialize
-  def index(*args)
-    reset!
-    Redpear::Index.new(*args).tap do |col|
+    klass.new(*args).tap do |col|
       self << col
     end
   end
