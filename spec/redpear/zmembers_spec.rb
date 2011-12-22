@@ -46,6 +46,14 @@ describe Redpear::ZMembers do
     subject.score("D").should == 60
   end
 
+  it "should allow updating items" do
+    subject.add(Post.new(:id => "C", :votes => 50))
+    subject.score("C").should == 50
+
+    subject.add(Post.new(:id => "C", :votes => 80))
+    subject.score("C").should == 80
+  end
+
   it "should allow removing items" do
     subject.remove(Post.new(:id => "B"))
     subject.include?("B").should be(false)

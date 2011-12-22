@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/dim/fakeredis.git
-  revision: 8e195fd79c46c2f11652b4bf396f3574a2db906f
+  revision: 2b905b9f5b99a06bc8f4a85ca85499fe946645ad
   specs:
     fakeredis (0.2.2)
       redis (~> 2.2.0)
@@ -8,7 +8,7 @@ GIT
 PATH
   remote: .
   specs:
-    redpear (0.4.3)
+    redpear (0.5.0)
       nest (~> 1.1.0)
       redis (~> 2.2.0)
 

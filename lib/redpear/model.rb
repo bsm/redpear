@@ -58,15 +58,22 @@ class Redpear::Model < Hash
     self["id"] = value.to_s
   end
 
-  # Custom comparator
-  # @return [Boolean]
+  # Custom comparator, inspired by ActiveRecord::Base#==
+  # @param [Object] other the comparison object
+  # @return [Boolean] true, if +other+ is persisted and ID 
   def ==(other)
     case other
     when Redpear::Model
-      other.instance_of?(self.class) && to_hash(true) == other.to_hash(true)
+      other.instance_of?(self.class) && persisted? && other.id == id
     else
       super
     end
+  end
+  alias :eql? :==
+
+  # Use ID as base for hash
+  def hash
+    id.hash
   end
 
   # Attribute reader with type-casting

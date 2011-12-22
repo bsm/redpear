@@ -13,7 +13,7 @@ describe Redpear::ZIndex do
   end
 
   it 'should return members for a value' do
-    subject.members(123).should be_a(Redpear::Members)
+    subject.members(123).should be_instance_of(Redpear::ZMembers)
     subject.members(123).should == []
     subject.nest(123).zadd 1, "A"
     subject.members(123).should == ["A"]

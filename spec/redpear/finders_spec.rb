@@ -15,7 +15,7 @@ describe Redpear::Finders do
   it { subject.should be_a(described_class) }
 
   it 'should retrieve members' do
-    subject.class.members.should be_a(Redpear::Members)
+    subject.class.members.should be_instance_of(Redpear::Members)
     subject.class.members.to_a.should =~ ["1", "2", "3"]
   end
 
@@ -26,7 +26,7 @@ describe Redpear::Finders do
   it 'should retrieve all records' do
     Post.find(3).expire(Time.now)
     subject.class.all.should have(2).items
-    subject.class.all.first.should be_a(Post)
+    subject.class.all.first.should be_instance_of(Post)
   end
 
   it 'should find each record' do
@@ -39,7 +39,7 @@ describe Redpear::Finders do
   end
 
   it 'should find individual records' do
-    subject.class.find(1).should be_a(Post)
+    subject.class.find(1).should be_instance_of(Post)
     subject.class.find(1).should == { "id" => "1" }
     subject.class.find(1).to_hash.should == { "id" => "1", "title" => "A", "body" => "B", "votes" => nil, "created_at" => nil, "user_id"=>nil }
     subject.class.find(100).should be_nil

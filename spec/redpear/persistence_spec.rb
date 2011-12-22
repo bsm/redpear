@@ -106,7 +106,7 @@ describe Redpear::Persistence do
         saved = Post.save :name => 'A', :id => 1234
       }.should change { subject.class.members.to_a }.from([]).to(['1234'])
 
-      saved.should be_a(Post)
+      saved.should be_instance_of(Post)
       saved.nest.should == "posts:1234"
       saved.nest.mapped_hmget_all.should == { 'name' => 'A' }
     end

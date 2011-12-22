@@ -11,7 +11,7 @@ describe Redpear::Connection do
   end
 
   it 'should have a default connection' do
-    Post.connection.should be_a(Redis)
+    Post.connection.should be_instance_of(Redis)
   end
 
   it 'should be inheritable' do
