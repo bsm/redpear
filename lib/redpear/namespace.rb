@@ -9,8 +9,8 @@
 #   # => ['comments:1', 'comments:+', 'comments:*', 'comments:post_id:2']
 #
 #   # Instance nesting
-#   instance.nest                  # => 'comments:1'
-#   instance.nest.mapped_hmget_all # => { "post_id" => "2" }
+#   instance.nest                 # => 'comments:1'
+#   instance.nest.hgetall         # => { "post_id" => "2" }
 #
 #   # Member nesting
 #   Comment.mb_nest               # "comments:[~]"

@@ -52,7 +52,7 @@ module Redpear::Persistence
 
   # Load attributes from DB (destructive)
   def refresh_attributes
-    update nest.mapped_hmget(*__loadable_attributes__) if persisted?
+    update nest.hgetall if persisted?
     @__loaded__ = true
     self
   end
@@ -128,11 +128,6 @@ module Redpear::Persistence
         result[key] = __persistable_value__(value)
       end
       result
-    end
-
-    # Attributes that can be loaded
-    def __loadable_attributes__
-      self.class.columns.names
     end
 
     def __persistable_value__(value)

@@ -32,13 +32,13 @@ describe Redpear::Persistence do
   it 'should reload records' do
     subject.save
     subject.update "name" => "C"
-    subject.tap(&:reload).should == { "id" => "123", "title" => "B", "votes" => nil, "body" => nil, "created_at" => "1313131313", "user_id" => nil }
+    subject.tap(&:reload).should == { "id" => "123", "title" => "B", "created_at" => "1313131313" }
   end
 
   it 'should refresh record attributes' do
     subject.save
     subject.update "name" => "C", "title" => "Z"
-    subject.tap(&:refresh_attributes).should == { "id" => "123", "title" => "B", "name" => "C", "votes" => nil, "body" => nil, "created_at" => "1313131313", "user_id" => nil }
+    subject.tap(&:refresh_attributes).should == { "id" => "123", "title" => "B", "name" => "C", "created_at" => "1313131313" }
   end
 
   describe "saving" do
@@ -56,7 +56,7 @@ describe Redpear::Persistence do
       lambda {
         subject.save.should == subject
       }.should change { subject.nest.exists }.from(false).to(true)
-      subject.nest.mapped_hmget_all.should == { 'title' => 'B', "created_at" => "1313131313" }
+      subject.nest.hgetall.should == { 'title' => 'B', "created_at" => "1313131313" }
     end
 
     it 'should save with a bang' do
@@ -67,6 +67,7 @@ describe Redpear::Persistence do
       lambda {
         blank_instance.save.should == blank_instance
       }.should change { blank_instance.nest.exists }.from(false).to(true)
+      Post.find(blank_instance.id).should == blank_instance
     end
 
     it 'should store the ID in the members index' do
@@ -108,7 +109,7 @@ describe Redpear::Persistence do
 
       saved.should be_instance_of(Post)
       saved.nest.should == "posts:1234"
-      saved.nest.mapped_hmget_all.should == { 'name' => 'A' }
+      saved.nest.hgetall.should == { 'name' => 'A' }
     end
 
   end
