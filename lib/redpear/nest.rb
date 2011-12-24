@@ -2,40 +2,47 @@
 # Heavily "inspired" by the nest library
 # Original copyright: Michel Martens & Damian Janowski
 class Redpear::Nest < ::String
- 
+
   MASTER_METHODS = %w|
-    auth bgrewriteaof bgsave blpop brpop
-    decr decrby del
-    expire expireat
+    append auth
+    bgrewriteaof bgsave blpop brpop brpoplpush
+    config
+    decr decrby del discard
+    exec expire expireat
     flushall flushdb getset
     hset hsetnx hincrby hmset hdel
     incr incrby
-    lpop lpush lrem lset ltrim
-    mapped_hmset move mset msetnx
-    psubscribe punsubscribe quit 
-    rename renamenx rpop rpoplpush rpush
-    sadd save sdiffstore set setex setnx sinterstore
-    shutdown smove spop srem subscribe sunionstore
-    unsubscribe
-    zadd zincrby zrem zremrangebyrank zremrangebyscore
+    linsert lpop lpush lpushx lrem lset ltrim
+    mapped_hmset mapped_mset mapped_msetnx
+    move mset msetnx multi
+    persist pipelined psubscribe punsubscribe quit
+    rename renamenx rpop rpoplpush rpush rpushx
+    sadd save sdiffstore set setbit
+    setex setnx setrange sinterstore
+    shutdown smove spop srem subscribe
+    sunionstore sync synchronize
+    unsubscribe unwatch watch
+    zadd zincrby zinterstore zrem
+    zremrangebyrank zremrangebyscore zunionstore
   |.freeze
 
   SLAVE_METHODS = %w|
-    dbsize debug exists get
+    dbsize debug get getbit getrange
+    echo exists
     hget hmget hexists hlen hkeys hvals hgetall
     info keys lastsave lindex llen lrange
-    mapped_mget mget monitor
-    publish randomkey
+    mapped_hmget mapped_mget mget monitor
+    object ping publish randomkey
     scard sdiff select sinter sismember slaveof
-    smembers sort srandmember sunion
+    smembers sort srandmember strlen substr sunion
     ttl type
     zcard zcount zrange zrangebyscore zrank
-    zrevrange zrevrank zscore
+    zrevrange zrevrangebyscore zrevrank zscore
   |.freeze
-  
+
   attr_reader :master, :slave, :current
-  
-  # Constructor  
+
+  # Constructor
   # @param [String] key
   #   The redis key
   # @param [Redis::Client|Redis::Namespace|ConnectionPool] master
@@ -67,7 +74,7 @@ class Redpear::Nest < ::String
     @current = nil
   end
   alias_method :with, :with_connection
-  
+
   MASTER_METHODS.each do |meth|
     define_method(meth) do |*args, &block|
       (current || master).send(meth, self, *args, &block)
@@ -79,5 +86,5 @@ class Redpear::Nest < ::String
       (current || slave).send(meth, self, *args, &block)
     end
   end
-  
+
 end

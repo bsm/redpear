@@ -22,12 +22,23 @@ describe Redpear::Nest do
     subject.master.should == connection
     subject.slave.should == connection
   end
-  
+
+  (described_class::MASTER_METHODS + described_class::SLAVE_METHODS).each do |method|
+    let :redis_methods do
+      Redis.instance_methods.map(&:to_sym)
+    end
+
+    it "should delegate '#{method}' to client" do
+      subject.master.should respond_to(method)
+      redis_methods.should include(method.to_sym)
+    end
+  end
+
   describe "sharding" do
     let(:master) { mock("MASTER") }
-    let(:slave)  { mock("SLAVE") }    
+    let(:slave)  { mock("SLAVE") }
     subject      { described_class.new "random", master, slave }
-    
+
     it 'should delegate reads to slaves' do
       slave.should_receive(:get).with('random')
       subject.get
@@ -52,11 +63,11 @@ describe Redpear::Nest do
         subject.set 'value'
         subject.get
       end
-      
+
       slave.should_receive(:get).with('random')
       subject.get
     end
-    
+
   end
 
 end
