@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.name        = "redpear"
   s.summary     = "Redpear, a Redis ORM"
   s.description = "Simple, elegant & efficient ORM for Redis"
-  s.version     = "0.6.0"
+  s.version     = "0.6.1"
 
   s.authors     = ["Dimitrij Denissenko"]
   s.email       = "dimitrij@blacksquaremedia.com"
@@ -18,8 +18,6 @@ Gem::Specification.new do |s|
   s.files        = Dir['lib/**/*']
 
   s.add_dependency "redis", "~> 2.2.0"
-  s.add_dependency "nest", "~> 1.1.0"
-
   s.add_development_dependency "rake"
   s.add_development_dependency "bundler"
   s.add_development_dependency "rspec"
