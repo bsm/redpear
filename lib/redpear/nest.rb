@@ -77,13 +77,23 @@ class Redpear::Nest < ::String
 
   MASTER_METHODS.each do |meth|
     define_method(meth) do |*args, &block|
-      (current || master).send(meth, self, *args, &block)
+      client = current || master
+      if Redis.instance_method(meth).arity.zero?
+        client.send(meth, &block)
+      else
+        client.send(meth, self, *args, &block)
+      end
     end
   end
 
   SLAVE_METHODS.each do |meth|
     define_method(meth) do |*args, &block|
-      (current || slave).send(meth, self, *args, &block)
+      client = current || slave
+      if Redis.instance_method(meth).arity.zero?
+        client.send(meth, &block)
+      else
+        client.send(meth, self, *args, &block)
+      end
     end
   end
 

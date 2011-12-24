@@ -5,7 +5,7 @@
 #   end
 #   instance = Comment.save(:post_id => 2)
 #
-#   Comment.connection.keys
+#   Comment.namespace.keys
 #   # => ['comments:1', 'comments:+', 'comments:*', 'comments:post_id:2']
 #
 #   # Instance nesting
@@ -31,10 +31,10 @@ module Redpear::Namespace
 
     # @return [Redpear::Nest] the namespace of this model, Example:
     #
-    #   Comment.namespace # => "comments":Nest
+    #   Comment.namespace # => "comments":Redpear::Nest
     #
     def namespace
-      @namespace ||= Redpear::Nest.new(scope, connection)
+      @namespace ||= Redpear::Nest.new(scope, master_connection, slave_connection)
     end
 
     # @return [String] the scope of this model. Example:

@@ -7,7 +7,7 @@ module Redpear::Persistence
     # Runs a bulk-operation.
     # @yield [] operations that should be run in the transaction
     def transaction(&block)
-      connection.multi(&block)
+      namespace.multi(&block)
     end
 
     # Create or update a record. Example:

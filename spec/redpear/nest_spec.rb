@@ -34,6 +34,14 @@ describe Redpear::Nest do
     end
   end
 
+  it "should delegate correctly" do
+    subject.multi do
+      subject.hset "a", "1"
+      subject.hset "b", "2"
+    end
+    subject.hgetall.should == { "a" => "1", "b" => "2" }
+  end
+
   describe "sharding" do
     let(:master) { mock("MASTER") }
     let(:slave)  { mock("SLAVE") }

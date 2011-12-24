@@ -11,6 +11,7 @@ describe Redpear::Namespace do
     it 'should have a namespace' do
       subject.class.namespace.should be_instance_of(Redpear::Nest)
       subject.class.namespace.should == "posts"
+      subject.class.namespace.master.should == Redis.current
     end
 
     it 'should have a members nest' do
