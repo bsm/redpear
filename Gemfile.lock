@@ -8,7 +8,7 @@ GIT
 PATH
   remote: .
   specs:
-    redpear (0.6.1)
+    redpear (0.6.2)
       redis (~> 2.2.0)
 
 GEM
