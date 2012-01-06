@@ -1,4 +1,5 @@
 require "redis"
+require "date"
 
 module Redpear
 

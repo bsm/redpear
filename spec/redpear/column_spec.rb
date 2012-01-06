@@ -10,6 +10,10 @@ describe Redpear::Column do
     described_class.new Post, :age, :integer
   end
 
+  let :float do
+    described_class.new Post, :score, :float
+  end
+
   let :timestamp do
     described_class.new Post, :created_at, :timestamp
   end
@@ -54,11 +58,21 @@ describe Redpear::Column do
 
     integer.type_cast(nil).should == nil
     integer.type_cast("a").should == nil
+    integer.type_cast("12.3").should == nil
     integer.type_cast("123").should == 123
+    integer.type_cast("-123").should == -123
+
+    float.type_cast(nil).should == nil
+    float.type_cast("a").should == nil
+    float.type_cast("123").should == 123.0
+    float.type_cast("12.3").should == 12.3
+    float.type_cast("-12.3").should == -12.3
 
     counter.type_cast(nil).should == 0
     counter.type_cast("a").should == 0
+    counter.type_cast("12.3").should == 0
     counter.type_cast("123").should == 123
+    counter.type_cast("-123").should == -123
 
     timestamp.type_cast(nil).should == nil
     timestamp.type_cast("a").should == nil

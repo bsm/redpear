@@ -7,7 +7,7 @@ class Redpear::Column < String
   # @param [String] name
   #   the column name
   # @param [Symbol] type
-  #   the column type (:string (default), :counter, :integer, :timestamp)
+  #   the column type (:string (default), :counter, :integer, :float, :timestamp)
   def initialize(model, name, type = nil)
     super name.to_s
     @model = model
@@ -22,9 +22,11 @@ class Redpear::Column < String
   def type_cast(value, type = self.type)
     case type
     when :counter
-      value.to_i
+      type_cast(value, :integer).to_i
     when :integer
       Kernel::Integer(value) rescue nil if value
+    when :float
+      Kernel::Float(value) rescue nil if value
     when :timestamp
       value = type_cast(value, :integer)
       Time.at(value) if value

@@ -10,7 +10,7 @@ class Redpear::ZIndex < Redpear::Index
   # @param [Symbol] callback
   #   method to be call on the object, to determine the score
   # @param [Symbol] type
-  #   the column type (:string (default), :counter, :integer, :timestamp)
+  #   the column type (:string (default), :counter, :integer, :float, :timestamp)
   def initialize(model, name, callback, type = nil)
     super(model, name, type)
     @callback = callback
