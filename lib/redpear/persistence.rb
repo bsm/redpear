@@ -124,7 +124,7 @@ module Redpear::Persistence
     def __persistable_attributes__
       result = {}
       each do |key, value|
-        next if key == "id"
+        next unless self.class.columns.include?(key)
         result[key] = __persistable_value__(value)
       end
       result

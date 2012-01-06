@@ -87,6 +87,11 @@ describe Redpear::Persistence do
       connection.keys.should =~ ["posts:123", "posts:[~]"]
     end
 
+    it 'should store only relevant attributes' do
+      saved = Post.save :title => 'A', :id => 1234, :invalid => "X"
+      saved.nest.hgetall.should == { 'title' => 'A' }
+    end
+
     it 'should allow to expire on save' do
       subject.save :expire => 3600
       subject.ttl.should > 0
@@ -104,12 +109,12 @@ describe Redpear::Persistence do
     it 'should allow shortcut-save records' do
       saved = nil
       lambda {
-        saved = Post.save :name => 'A', :id => 1234
+        saved = Post.save :title => 'A', :id => 1234
       }.should change { subject.class.members.to_a }.from([]).to(['1234'])
 
       saved.should be_instance_of(Post)
       saved.nest.should == "posts:1234"
-      saved.nest.hgetall.should == { 'name' => 'A' }
+      saved.nest.hgetall.should == { 'title' => 'A' }
     end
 
   end

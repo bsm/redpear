@@ -25,6 +25,12 @@ class Redpear::Schema::Collection < Array
   end
 
   # @param [String] the column name
+  # @return [Boolean] if name is part of the collection
+  def include?(name)
+    lookup.key?(name.to_s)
+  end
+
+  # @param [String] the column name
   # @return [Redpear::Column] the column for the given name
   def [](name)
     lookup[name.to_s]

@@ -36,6 +36,13 @@ describe Redpear::Schema::Collection do
     subject[:title].should be_instance_of(Redpear::Column)
   end
 
+  it 'should indicate if a column is included' do
+    store_column
+    subject.include?(:title).should be(true)
+    subject.include?('title').should be(true)
+    subject.include?('other').should be(false)
+  end
+
   it 'should convert column names' do
     lambda { store_column }.should change { subject.dup }.from([]).to(["title"])
   end
