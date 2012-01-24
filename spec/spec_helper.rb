@@ -9,7 +9,7 @@ require 'fakeredis'
 module RSpec::ConnectionHelperMethods
 
   def connection
-    Redpear::Model.master_connection
+    @connection ||= Redpear::Connection.new
   end
 
 end

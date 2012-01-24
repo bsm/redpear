@@ -10,6 +10,7 @@ module Redpear
 
   autoload :Column
   autoload :Concern
+  autoload :Connect
   autoload :Connection
   autoload :Counters
   autoload :Expiration
@@ -21,6 +22,7 @@ module Redpear
   autoload :Nest
   autoload :Persistence
   autoload :Schema
+  autoload :Store
   autoload :ZIndex
   autoload :ZMembers
 

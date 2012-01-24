@@ -27,7 +27,7 @@ Redpear is VERY lightweight. Compared with other ORMs, it offers raw speed at
 the expense of convenience.
 =end
 class Redpear::Model < Hash
-  include Redpear::Connection
+  include Redpear::Connect
   include Redpear::Namespace
   include Redpear::Persistence
   include Redpear::Expiration
@@ -60,7 +60,7 @@ class Redpear::Model < Hash
 
   # Custom comparator, inspired by ActiveRecord::Base#==
   # @param [Object] other the comparison object
-  # @return [Boolean] true, if +other+ is persisted and ID 
+  # @return [Boolean] true, if +other+ is persisted and ID
   def ==(other)
     case other
     when Redpear::Model

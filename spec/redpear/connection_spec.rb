@@ -2,37 +2,69 @@ require 'spec_helper'
 
 describe Redpear::Connection do
 
-  before do
-    Post.master_connection = nil
-    Post.slave_connection = nil
+  it { should respond_to(:get) }
+  it { should respond_to(:set) }
+  it { should respond_to(:hgetall) }
+  it { should respond_to(:mapped_hmset) }
+
+  it "should use master for everything, unless slave specified" do
+    subject.master.should be(Redis.current)
+    subject.slave.should be(subject.master)
   end
 
-  after do
-    Post.master_connection = nil
-    Post.slave_connection = nil
-  end
-
-  it 'should have a default master connection' do
-    Post.master_connection.should be_instance_of(Redis)
-    Post.master_connection.should == Redis.current
-    Post.connection.should be(Post.master_connection)
-  end
-
-  it 'should have no default slave connection' do
-    Post.slave_connection.should be_nil
-  end
-
-  describe "master" do
-
-    it 'should be inheritable' do
-      Post.master_connection.should be(Redpear::Model.master_connection)
-      Post.master_connection.should be(Comment.master_connection)
+  (described_class::MASTER_METHODS + described_class::SLAVE_METHODS).each do |method|
+    let :redis_methods do
+      Redis.instance_methods.map(&:to_sym)
     end
 
-    it 'should be overridable' do
-      Post.master_connection = Redis.new
-      Post.master_connection.should_not be(Redpear::Model.master_connection)
+    it "should delegate '#{method}' to client" do
+      subject.master.should respond_to(method)
+      redis_methods.should include(method.to_sym)
+    end
+  end
+
+  it "should delegate correctly" do
+    subject.multi do
+      subject.hset "field", "a", "1"
+      subject.hset "field", "b", "2"
+    end
+    subject.hgetall("field").should == { "a" => "1", "b" => "2" }
+  end
+
+  describe "sharding" do
+    let(:master) { mock("MASTER") }
+    let(:slave)  { mock("SLAVE") }
+    subject      { described_class.new master, slave }
+
+    it 'should delegate reads to slaves' do
+      slave.should_receive(:get).with('field')
+      subject.get 'field'
+
+      slave.should_receive(:hmget).with('field', 'a', 'b', 'c')
+      subject.hmget 'field', 'a', 'b', 'c'
+    end
+
+    it 'should delegate writes to master' do
+      master.should_receive(:set).with('field', 'value')
+      subject.set 'field', 'value'
+
+      master.should_receive(:hmset).with('field', 'k1', 'a', 'k2', 'b')
+      subject.hmset 'field', 'k1', 'a', 'k2', 'b'
+    end
+
+    it 'should allow block operations to a single connection' do
+      master.should_receive(:set).with('field', 'value')
+      master.should_receive(:get).with('field')
+
+      subject.on(:master) do
+        subject.set 'field', 'value'
+        subject.get 'field'
+      end
+
+      slave.should_receive(:get).with('field')
+      subject.get 'field'
     end
 
   end
+
 end
