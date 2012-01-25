@@ -63,13 +63,6 @@ describe Redpear::Persistence do
       subject.save!.should == subject
     end
 
-    it 'should save "blank" instances' do
-      lambda {
-        blank_instance.save.should == blank_instance
-      }.should change { blank_instance.nest.exists }.from(false).to(true)
-      Post.find(blank_instance.id).should == blank_instance
-    end
-
     it 'should store the ID in the members index' do
       lambda {
         subject.save
@@ -79,7 +72,7 @@ describe Redpear::Persistence do
     it 'should store the ID in column indexes' do
       indexable_instance.save
       connection.keys.should =~ ["comments:123", "comments:[~]", "comments:[post_id]:456"]
-      connection.get('comments:[post_id]:456').should == ['123'].to_set
+      connection.smembers('comments:[post_id]:456').should == ['123']
     end
 
     it 'should NOT store the ID in column indexes if column value is empty' do
@@ -143,10 +136,10 @@ describe Redpear::Persistence do
 
     it 'should remove ID from column indices' do
       indexable_instance.save
-      connection.get('comments:[post_id]:456').should have(1).item
+      connection.smembers('comments:[post_id]:456').should have(1).item
 
       indexable_instance.destroy
-      connection.get('comments:[post_id]:456').should be_empty
+      connection.smembers('comments:[post_id]:456').should be_empty
     end
 
     it 'should allow shortcut-destroy records' do

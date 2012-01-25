@@ -48,7 +48,8 @@ class Redpear::ZMembers < Redpear::Members
   # @return [Integer] the score for a member
   # This method is not cached.
   def score(value)
-    nest.zscore(value)
+    result = nest.zscore(value)
+    result.to_i if result
   end
 
   # Add a member to this set

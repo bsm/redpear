@@ -26,11 +26,12 @@ describe Redpear::Store::Hash do
     yielded.should == [['a', 'b']]
   end
 
-  it 'should yield over pairs' do
-    subject.delete('a').should be_nil
-    subject.store('a', 'b')
-    subject.delete('a').should == "b"
-    subject.delete('a').should be_nil
+  it 'should delete fields' do
+    subject.store('a', '1')
+    subject.store('b', '2')
+    subject.should == { 'a' => '1', 'b' => '2' }
+    subject.delete('a')
+    subject.should == { 'b' => '2' }
   end
 
   it 'should check if key exists' do

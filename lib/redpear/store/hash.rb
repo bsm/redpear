@@ -103,4 +103,10 @@ class Redpear::Store::Hash < Redpear::Store::Base
     conn.hmset key, *hash.flatten
   end
 
+  # Comparator
+  # @return [Boolean] true if same as `other`
+  def ==(other)
+    other.respond_to?(:to_hash) && other.to_hash == to_hash
+  end
+
 end

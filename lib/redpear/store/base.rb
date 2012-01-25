@@ -13,4 +13,13 @@ class Redpear::Store::Base
 
   alias to_s key
 
+  private
+
+    def range_pair(range)
+      first = range.first.to_i
+      last  = range.last.to_i
+      last -= 1 if range.exclude_end?
+      [first, last]
+    end
+
 end

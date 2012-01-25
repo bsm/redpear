@@ -3,8 +3,17 @@ require 'bundler/setup'
 
 require 'rspec'
 require 'redpear'
-require 'fakeredis'
 
+count = Redis.current.keys.size
+unless count.zero?
+  STDERR.puts
+  STDERR.puts " ! -----> WARNING! <-----"
+  STDERR.puts " ! Your Redis (test) database at #{Redis.current.id} contains #{count} keys."
+  STDERR.puts " ! Running specs would wipe your database and result in potentail data loss."
+  STDERR.puts " ! Please specify a REDIS_URL environment variable to point to another, empty instance."
+  STDERR.puts
+  abort
+end
 
 module RSpec::ConnectionHelperMethods
 
@@ -16,6 +25,7 @@ end
 
 RSpec.configure do |config|
   config.include RSpec::ConnectionHelperMethods
+
   config.after do
     connection.flushdb
   end

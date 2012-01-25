@@ -138,7 +138,7 @@ class Redpear::Store::Set < Redpear::Store::Base
   # Comparator
   # @return [Boolean] true if contains same members as other
   def ==(other)
-    other.respond_to?(:to_set) ? other.to_set == to_set : super
+    other.respond_to?(:to_set) && other.to_set == to_set
   end
 
   # Move a value to +target+ set
