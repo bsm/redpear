@@ -27,13 +27,23 @@ Redpear is VERY lightweight. Compared with other ORMs, it offers raw speed at
 the expense of convenience.
 =end
 class Redpear::Model < Hash
-  include Redpear::Connect
   include Redpear::Namespace
   include Redpear::Persistence
   include Redpear::Expiration
   include Redpear::Counters
   include Redpear::Schema
   include Redpear::Finders
+
+  class << self
+
+    attr_writer :connection
+
+    # @return [Redpear::Connection] the connection
+    def connection
+      @connection ||= (superclass.respond_to?(:connection) ? superclass.connection : Redpear::Connection.new)
+    end
+
+  end
 
   # Ensure we can read raw level values
   alias_method :__fetch__, :[]

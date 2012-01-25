@@ -34,7 +34,7 @@ module Redpear::Namespace
     #   Comment.namespace # => "comments":Redpear::Nest
     #
     def namespace
-      @namespace ||= Redpear::Nest.new(scope, master_connection, slave_connection)
+      @namespace ||= Redpear::Nest.new(scope, connection)
     end
 
     # @return [String] the scope of this model. Example:

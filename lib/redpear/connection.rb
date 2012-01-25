@@ -37,7 +37,8 @@ class Redpear::Connection
     zrevrange zrevrangebyscore zrevrank zscore
   |.freeze
 
-  attr_reader :master, :slave, :current
+  attr_reader   :current
+  attr_accessor :master, :slave
 
   # Constructor
   # @param [Redis::Client|Redis::Namespace|ConnectionPool] master
@@ -62,7 +63,7 @@ class Redpear::Connection
 
   MASTER_METHODS.each do |meth|
     define_method(meth) do |*a, &b|
-      (master || slave).send(meth, *a, &b)
+      (current || master).send(meth, *a, &b)
     end
   end
 

@@ -3,56 +3,20 @@
 # Original copyright: Michel Martens & Damian Janowski
 class Redpear::Nest < ::String
 
-  MASTER_METHODS = %w|
-    append auth
-    bgrewriteaof bgsave blpop brpop brpoplpush
-    config
-    decr decrby del discard
-    exec expire expireat
-    flushall flushdb getset
-    hset hsetnx hincrby hmset hdel
-    incr incrby
-    linsert lpop lpush lpushx lrem lset ltrim
-    mapped_hmset mapped_mset mapped_msetnx
-    move mset msetnx multi
-    persist pipelined psubscribe punsubscribe quit
-    rename renamenx rpop rpoplpush rpush rpushx
-    sadd save sdiffstore set setbit
-    setex setnx setrange sinterstore
-    shutdown smove spop srem subscribe
-    sunionstore sync synchronize
-    unsubscribe unwatch watch
-    zadd zincrby zinterstore zrem
-    zremrangebyrank zremrangebyscore zunionstore
-  |.freeze
+  def self.arity_cache
+    @arity_cache ||= {}
+  end
 
-  SLAVE_METHODS = %w|
-    dbsize debug get getbit getrange
-    echo exists
-    hget hmget hexists hlen hkeys hvals hgetall
-    info keys lastsave lindex llen lrange
-    mapped_hmget mapped_mget mget monitor
-    object ping publish randomkey
-    scard sdiff select sinter sismember slaveof
-    smembers sort srandmember strlen substr sunion
-    ttl type
-    zcard zcount zrange zrangebyscore zrank
-    zrevrange zrevrangebyscore zrevrank zscore
-  |.freeze
-
-  attr_reader :master, :slave, :current
+  attr_reader :connection
 
   # Constructor
   # @param [String] key
   #   The redis key
-  # @param [Redis::Client|Redis::Namespace|ConnectionPool] master
-  #   The master connection, optional, defaults to the current connection
-  # @param [Redis::Client|Redis::Namespace|ConnectionPool] slave
-  #   The slave connection, optional, defaults to master
-  def initialize(key, master = Redis.current, slave = nil)
+  # @param [Redpear::Connection] connection
+  #   The connection
+  def initialize(key, connection)
     super(key)
-    @master = master
-    @slave  = slave || master
+    @connection = connection
   end
 
   # @param [multiple] keys
@@ -60,41 +24,34 @@ class Redpear::Nest < ::String
   # @return [Redpear::Nest]
   #   The nested key
   def [](*keys)
-    self.class.new [self, *keys].join(':'), master, slave
+    self.class.new [self, *keys].join(':'), connection
   end
 
-  # @param [Symbol] name
-  #   Either :master or :slave
-  # @yield
-  #   Perform a block with the given connection
-  def with_connection(name)
-    @current = send(name)
-    yield
-  ensure
-    @current = nil
+  # @overload delegate to connection
+  def respond_to?(sym, *a)
+    super || connection.respond_to?(sym, *a)
   end
-  alias_method :with, :with_connection
 
-  MASTER_METHODS.each do |meth|
-    define_method(meth) do |*args, &block|
-      client = current || master
-      if Redis.instance_method(meth).arity.zero?
-        client.send(meth, &block)
+  protected
+
+    # @overload delegate to connection
+    def method_missing(sym, *a, &b)
+      if connection.respond_to?(sym)
+        call(sym, *a, &b)
       else
-        client.send(meth, self, *args, &block)
+        super
       end
     end
-  end
 
-  SLAVE_METHODS.each do |meth|
-    define_method(meth) do |*args, &block|
-      client = current || slave
-      if Redis.instance_method(meth).arity.zero?
-        client.send(meth, &block)
+  private
+
+    def call(method, *a, &b)
+      case self.class.arity_cache[method] ||= Redis.instance_method(method).arity
+      when 0
+        connection.send(method, &b)
       else
-        client.send(meth, self, *args, &block)
+        connection.send(method, self, *a, &b)
       end
     end
-  end
 
 end

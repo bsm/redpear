@@ -8,6 +8,27 @@ describe Redpear::Model do
 
   it { should be_a(Hash) }
 
+  describe "connection" do
+
+    it 'should have a default' do
+      User.connection.should be_instance_of(Redpear::Connection)
+    end
+
+    it 'can have a custom' do
+      Manager.connection.should be_a(ManagerConnection)
+    end
+
+    it 'should be inheritable' do
+      Employee.connection.should be(User.connection)
+    end
+
+    it 'should be overridable' do
+      User.should respond_to(:connection=)
+    end
+
+  end
+
+
   it 'should initialize with attributes' do
     described_class.new(:id => 1).should == { "id" => "1" }
   end
@@ -43,7 +64,7 @@ describe Redpear::Model do
     Post.new(:id => 1, :title => "A").should == Post.new(:id => 1, :title => "B")
     Post.new(:id => 1).should_not == Post.new
     Post.new(:id => 1).should_not == Post.new(:id => 2)
-    
+
     Post.new.should_not == Post.new
     Post.new.should_not == Comment.new
     Post.new(:id => 1).should_not == Comment.new(:id => 1)

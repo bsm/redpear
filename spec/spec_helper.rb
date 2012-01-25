@@ -37,3 +37,13 @@ end
 class User < Redpear::Model
   column :name
 end
+
+class ManagerConnection < Redpear::Connection
+end
+
+class Employee < User
+end
+
+class Manager < Employee
+  self.connection = ManagerConnection.new
+end
