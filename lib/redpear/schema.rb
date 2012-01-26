@@ -1,6 +1,9 @@
 module Redpear::Schema
-  extend Redpear::Concern
   autoload :Collection, 'redpear/schema/collection'
+  autoload :Column, 'redpear/schema/column'
+  autoload :Index, 'redpear/schema/index'
+  autoload :Score, 'redpear/schema/score'
+  extend Redpear::Concern
 
   module ClassMethods
 
@@ -9,23 +12,23 @@ module Redpear::Schema
       @columns ||= Redpear::Schema::Collection.new
     end
 
-    # @param [multiple] the column definition. Please see Redpear::Column#initialize
+    # @param [multiple] the column definition. Please see Redpear::Schema::Column#initialize
     def column(*args)
-      columns.store(Redpear::Column, self, *args).tap do |col|
+      columns.store(Redpear::Schema::Column, self, *args).tap do |col|
         __define_attribute_accessors__(col)
       end
     end
 
     # @param [multiple] the index definition. Please see Redpear::Index#initialize
     def index(*args)
-      columns.store(Redpear::Index, self, *args).tap do |col|
+      columns.store(Redpear::Schema::Index, self, *args).tap do |col|
         __define_attribute_accessors__(col)
       end
     end
 
     # @param [multiple] the sorted index definition. Please see Redpear::ZIndex#initialize
-    def zindex(*args)
-      columns.store(Redpear::ZIndex, self, *args).tap do |col|
+    def score(*args)
+      columns.store(Redpear::Schema::Score, self, *args).tap do |col|
         __define_attribute_accessors__(col)
       end
     end

@@ -1,7 +1,7 @@
 # Stores the column information
 class Redpear::Schema::Collection < Array
 
-  # @param [multiple] the column definition. Please see Redpear::Column#initialize
+  # @param [multiple] the column definition. Please see Redpear::Schema::Column#initialize
   def store(klass, *args)
     reset!
     klass.new(*args).tap do |col|
@@ -14,14 +14,14 @@ class Redpear::Schema::Collection < Array
     @names ||= lookup.keys
   end
 
-  # @return [Array] the names of the indices only
-  def indices
-    @indices ||= select(&:index?)
-  end
-
   # @return [Hash] the column lookup, indexed by name
   def lookup
     @lookup ||= inject({}) {|r, c| r.update c.to_s => c }
+  end
+
+  # @return [Array] only the index columns
+  def indicies
+    @indicies ||= to_a.select {|i| i.is_a?(Redpear::Schema::Index) }
   end
 
   # @param [String] the column name
@@ -31,7 +31,7 @@ class Redpear::Schema::Collection < Array
   end
 
   # @param [String] the column name
-  # @return [Redpear::Column] the column for the given name
+  # @return [Redpear::Schema::Column] the column for the given name
   def [](name)
     lookup[name.to_s]
   end

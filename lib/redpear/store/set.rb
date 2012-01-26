@@ -1,5 +1,3 @@
-require 'set'
-
 class Redpear::Store::Set < Redpear::Store::Enumerable
   include Enumerable
 

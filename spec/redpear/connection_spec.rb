@@ -12,6 +12,35 @@ describe Redpear::Connection do
     subject.slave.should be(subject.master)
   end
 
+  it "can connect via URLs" do
+    url = Redis.current.id
+    url.should include('redis://')
+    ms = described_class.new url, url
+    ms.master.should_not be(ms.slave)
+  end
+
+  it "should accept transaction" do
+    subject.transaction do
+      subject.hset 'hash', 'a', 1
+      subject.hset 'hash', 'b', 2
+    end
+    subject.hgetall('hash').should == { 'a' => '1', 'b' => '2' }
+  end
+
+  it "should prevent transaction nesting" do
+    subject.transaction do
+      subject.hset 'hash', 'a', 1
+      subject.hset 'hash', 'b', 2
+      subject.transaction do
+        subject.hset 'hash', 'c', 3
+        subject.transaction do
+          subject.hset 'hash', 'd', 4
+        end
+      end
+    end
+    subject.hgetall('hash').should == { 'a' => '1', 'b' => '2', 'c' => '3', 'd' => '4' }
+  end
+
   (described_class::MASTER_METHODS + described_class::SLAVE_METHODS).each do |method|
     let :redis_methods do
       Redis.instance_methods.map(&:to_sym)

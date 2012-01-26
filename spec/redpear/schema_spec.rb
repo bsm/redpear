@@ -3,21 +3,13 @@ require 'spec_helper'
 describe Redpear::Schema do
 
   subject do
-    klass = Class.new(Redpear::Model)
-    klass.class_eval do
-      def self.name
-        "User"
-      end
-    end
+    klass = Class.new(Hash)
+    klass.send :include, described_class
     klass
   end
 
-  let :post do
-    Post.new
-  end
-
-  let :comment do
-    Comment.new
+  let :instance do
+    subject.new
   end
 
   it 'should maintain a column registry' do
@@ -28,35 +20,29 @@ describe Redpear::Schema do
     lambda {
       subject.column "name"
     }.should change { subject.columns.dup }.from([]).to(["name"])
-    subject.columns.first.should be_instance_of(Redpear::Column)
+    subject.columns.first.should be_instance_of(Redpear::Schema::Column)
   end
 
-  it 'should define/store indices' do
+  it 'should define/store indicies' do
     lambda {
       subject.index "name"
     }.should change { subject.columns.dup }.from([]).to(["name"])
-    subject.columns.first.should be_instance_of(Redpear::Index)
+    subject.columns.first.should be_instance_of(Redpear::Schema::Index)
   end
 
-  it 'should define/store sorted indices' do
+  it 'should define/store scores' do
     lambda {
-      subject.zindex "name", :id
+      subject.score "name"
     }.should change { subject.columns.dup }.from([]).to(["name"])
-    subject.columns.first.should be_instance_of(Redpear::ZIndex)
+    subject.columns.first.should be_instance_of(Redpear::Schema::Score)
   end
 
   it 'should create attribute accessor methods' do
-    post.title.should be_nil
-    post.votes.should == 0
-    comment.post_id.should be_nil
-
-    post.title = "A"
-    post.votes = 500
-    comment.post_id = 123
-
-    post.title.should == "A"
-    post.votes.should == 500
-    comment.post_id.should == 123
+    subject.column "some_col"
+    subject.instance_methods.should include(:some_col)
+    subject.instance_methods.should include(:some_col=)
+    instance.some_col = 'ABC'
+    instance.some_col.should == 'ABC'
   end
 
 end

@@ -1,4 +1,4 @@
-class Redpear::Column < String
+class Redpear::Schema::Column < String
   attr_reader :type, :model
 
   # Creates a new column.
@@ -35,6 +35,17 @@ class Redpear::Column < String
     end
   end
 
+  # Encodes a value, for storage
+  # @return [Object] the encoded value
+  def encode_value(value)
+    case value
+    when Time
+      value.to_i
+    else
+      value
+    end
+  end
+
   # @return [String] the column name
   def name
     to_s
@@ -48,11 +59,6 @@ class Redpear::Column < String
   # @return [Boolean] true if the column is writable
   def writable?
     true
-  end
-
-  # @return [Boolean] true if the column is an index
-  def index?
-    is_a? Redpear::Index
   end
 
 end

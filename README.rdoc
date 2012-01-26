@@ -20,14 +20,28 @@ very efficiently, minimising IO operations and storage space where possible.
 
 Let's create a post and a comment:
 
-  post = Post.create :title => "Hi!", :body => "I'm a new post"
-  comment = Comment.create :post_id => post.id, :body => "I like this!"
+  post = Post.new :title => "Hi!", :body => "I'm a new post"
+  post.id # => 100, automatically persisted
+  comment = Comment.new :post_id => post.id, :body => "I like this!"
+  comment.id # => 200
 
 Now let's find and update a Comment:
 
-  comment = Comment.find 123
+  comment = Comment.find 200
   comment.body = "This is fun!"
-  comment.save
+
+Under the hood:
+
+  Redis.current.keys
+  # => [ "posts:[~]",   # => Set { 1 } - stores the primary keys of all posts
+  #      "posts:[+]",   # => Counter value: "100" - stores last primary key value
+  #      "posts:100",   # => Hash { title: "Hi!", body: "I'm a new post" }
+  #      "comments:[~]" # => Set, as above, just for comments
+  #      "comments:[+]" # => Counter, as above, just for comments
+  #      "comments:200" # => Hash { post_id: 100, body: "I like this!" }
+  #      "comments:[post_id]:100" # => Set { 200 } - lookup for comments that
+  #                               # belong to post #100
+  #    ]
 
 == Installation
 

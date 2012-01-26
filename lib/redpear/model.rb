@@ -1,10 +1,7 @@
-require "set"
-require "redpear/core_ext/stringify_keys"
-
 =begin
 Redis is a simple key/value store, hence storing structured data can be a
-challenge. Redpear allows you to store/find/associate "records" in a Redis DB
-very efficiently, minimising IO operations and storage space where possible.
+challenge. Redpear::Model allows you to store/find/associate "records" in a Redis
+DB very efficiently, minimising IO operations and storage space where possible.
 
 For example:
 
@@ -18,64 +15,114 @@ For example:
     index :post_id
   end
 
-Let's create a post and a comment:
-
-  post = Post.save :title => "Hi!", :body => "I'm a new post"
-  comment = Comment.save :post_id => post.id, :body => "I like this!"
-
-Redpear is VERY lightweight. Compared with other ORMs, it offers raw speed at
-the expense of convenience.
+Redpear::Model is VERY lightweight. It is optimised for raw speed at the
+expense of convenience.
 =end
 class Redpear::Model < Hash
-  include Redpear::Namespace
-  include Redpear::Persistence
-  include Redpear::Expiration
-  include Redpear::Counters
   include Redpear::Schema
-  include Redpear::Finders
 
   class << self
 
+    # @param [Redpear::Connection] define a custom connection
     attr_writer :connection
+
+    # @param [String] define a custom scope
+    attr_writer :scope
 
     # @return [Redpear::Connection] the connection
     def connection
       @connection ||= (superclass.respond_to?(:connection) ? superclass.connection : Redpear::Connection.new)
     end
 
+    # @return [String] the scope of this model. Example:
+    #   Comment.scope # => "comments"
+    def scope
+      @scope ||= "#{name.split('::').last.downcase}s"
+    end
+
+    # @param [multiple] tokens
+    #   The tokens to add to the scope
+    # @return [String] the full scope.
+    # Examples:
+    #   Comment.scoped(123) # => "comments:123"
+    #   Comment.scoped("[i1]", 123) # => "comments:[i1]:123"
+    def scoped(*tokens)
+      [scope, *tokens].join(':')
+    end
+
     # @return [Redpear::Store::Set] the IDs of all existing records
     def members
-      @_members ||= Redpear::Store::Set.new [scope, "[~]"].join(':'), connection
+      @_members ||= Redpear::Store::Set.new scoped("~"), connection
     end
 
     # @return [Redpear::Store::Value] the generator of primary keys
-    def pk_generator
-      @_pk_generator ||= Redpear::Store::Value.new [scope, "[+]"].join(':'), connection
+    def pk_counter
+      @_pk_counter ||= Redpear::Store::Value.new scoped("+"), connection
     end
 
-  end
+    # Runs a bulk-operation.
+    # @yield operations that should be run in the transaction
+    def transaction(&block)
+      connection.transaction(&block)
+    end
 
-  # Ensure we can read raw level values
-  alias_method :__fetch__, :[]
+    # @return [Integer] the number of total records
+    def count
+      members.size
+    end
+
+    # @param [String] id the ID to check
+    # @return [Boolean] true or false
+    def exists?(id)
+      !id.nil? && members.include?(id)
+    end
+
+    # @param [String] id the ID of the record to find
+    # @return [Redpear::Model] a record, or nil when not found
+    def find(id)
+      instantiate(id) if exists?(id)
+    end
+
+    # @return [Array<Redpear::Model>] all records
+    def all
+      members.map &method(:find)
+    end
+
+    # @yield over each available record
+    # @yieldparam [Redpear::Model] record
+    def find_each
+      members.each do |id|
+        yield find(id)
+      end
+    end
+
+    # Destroys a record. Example:
+    # @param [String] id the ID of the record to destroy
+    # @return [Redpear::Model] the destroyed record
+    def destroy(id)
+      instantiate(id).tap(&:destroy)
+    end
+
+    # Allocate an instance
+    def instantiate(id)
+      instance = allocate
+      instance.send :store, 'id', id.to_s
+      instance
+    end
+    private :instantiate
+
+  end
 
   def initialize(attrs = {})
     super()
-    @__attributes__ = {}
-    @__loaded__     = true
+    store 'id', (attrs.delete("id") || attrs.delete(:id) || self.class.pk_counter.next).to_s
     update(attrs)
+    self.class.members.add(id)
   end
 
-  # Returns the ID of the record
-  # @return [String]
+  # @return [String] the ID of this record
   def id
-    value = __fetch__("id")
-    value.to_s if value
-  end
-
-  # ID accessor
-  # @param [Object] id
-  def id=(value)
-    self["id"] = value.to_s
+    fetch 'id'
   end
 
   # Custom comparator, inspired by ActiveRecord::Base#==
@@ -84,7 +131,7 @@ class Redpear::Model < Hash
   def ==(other)
     case other
     when Redpear::Model
-      other.instance_of?(self.class) && persisted? && other.id == id
+      other.instance_of?(self.class) && other.id == id
     else
       super
     end
@@ -96,57 +143,150 @@ class Redpear::Model < Hash
     id.hash
   end
 
-  # Attribute reader with type-casting
-  # @return [Object]
-  def [](name)
-    __ensure_loaded__
-    name = name.to_s
-    @__attributes__[name] ||= begin
-      column = self.class.columns.lookup[name]
-      value  = super(name)
-      column ? column.type_cast(value) : value
-    end
-  end
-
-  # Attribute writer
+  # Reads and (caches) a single value
   # @param [String] name
-  # @param [Object] value
-  def []=(name, value)
-    __ensure_loaded__
-    name = name.to_s
-    @__attributes__.delete(name)
-    super
+  #   The name of the attributes
+  # @return [Object]
+  #   The attribute value
+  def [](name)
+    column = self.class.columns[name]
+    return super if column.nil? || key?(column)
+
+    value = case column
+    when Redpear::Schema::Score
+      column.members[id]
+    when Redpear::Schema::Column
+      attributes[column]
+    end
+
+    store column, column.type_cast(value)
   end
 
-  # Returns a Hash with attributes
-  # @param [Boolean] clean
-  #   If true, only actual values will be returned (without nils), defaults to false
+  # Write a single attribute
+  # @param [String] name
+  #   The name of the attributes
+  # @param [Object] value
+  #   The value to store
+  def []=(name, value)
+    column = self.class.columns[name] || return
+    value  = column.encode_value(value)
+
+    case column
+    when Redpear::Schema::Score
+      column.members[id] = value
+    when Redpear::Schema::Index
+      column.members(value).add(id)
+      attributes[column] = value
+    when Redpear::Schema::Column
+      attributes[column] = value
+    end
+    delete column.to_s
+  end
+
+  # Increments the value of a counter attribute
+  # @param [String] name
+  #   The column name to increment
+  # @param [Integer] by
+  #   Increment by this value
+  def increment(name, by = 1)
+    column = self.class.columns[name]
+    return false unless column && column.type == :counter
+
+    store column, attributes.increment(column, by)
+  end
+
+  # Decrements the value of a counter attribute
+  # @param [String|Symbol] name
+  #   The column name to decrement
+  # @param [Integer] by
+  #   Decrement by this value
+  def decrement(name, by = 1)
+    increment name, -by
+  end
+
+  # Expires the record.
+  # @overload expire(time)
+  #   @param [Time] time The time to expire the record at
+  # @overload expire(number)
+  #   @param [Integer] number Expire in `number` of seconds from now
+  def expire(value)
+    attributes.expire(value)
+  end
+
+  # @return [Integer] the period this record has to live.
+  # May return nil for non-expiring records and non-existing records.
+  def ttl
+    attributes.ttl
+  end
+
+  # Bulk-updates the model
   # @return [Hash]
-  def to_hash(clean = false)
-    __ensure_loaded__
-    attrs = clean ? reject {|_, v| v.nil? } : self
-    {}.update(attrs)
+  def update(hash)
+    self.class.transaction do
+      bulk = {}
+      hash.each do |name, value|
+        column = self.class.columns[name] || next
+        value  = column.encode_value(value)
+
+        case column
+        when Redpear::Schema::Score
+          column.members[id] = value
+        when Redpear::Schema::Index
+          column.members(value).add(id)
+          bulk[column] = value
+        when Redpear::Schema::Column
+          bulk[column] = value
+        end
+      end
+      attributes.merge! bulk
+    end
+
+    clear
+  end
+
+  # Clear all the cached attributes, but keep ID
+  # @return [Hash] self
+  def clear
+    value = self.id
+    super
+  ensure
+    store 'id', value
+  end
+
+  # Returns the attributes store
+  # @return [Redpear::Store::Hash] attributes
+  def attributes
+    @_attributes ||= Redpear::Store::Hash.new self.class.scoped('~', id), self.class.connection
+  end
+
+  # Return lookups, relevant to this record
+  # @return [Array<Redpear::Store::Enumerable>] the lookups this record is related to
+  def lookups
+    @_lookups ||= [self.class.members] + self.class.columns.indicies.map {|i| i.for(self) }
+  end
+
+  # Destroy the record.
+  # @return [Boolean] true if successful
+  def destroy
+    lookups # Build before transaction
+    self.class.transaction do
+      lookups.each {|l| l.delete(id) }
+      attributes.purge!
+    end
+    true
   end
 
   # Show information about this record
   # @return [String]
   def inspect
-    __ensure_loaded__
     "#<#{self.class.name} #{super}>"
   end
 
-  # Bulk-update attributes
-  # @param [Hash] attrs
-  def update(attrs)
-    attrs = (attrs ? attrs.stringify_keys : {})
-    attrs["id"] = attrs["id"].to_s if attrs["id"]
-    super
+  # Cache a key/value pair
+  def store(key, value)
+    super key.to_s, value
   end
 
-  private
-
-    def __ensure_loaded__
-      refresh_attributes unless @__loaded__
-    end
+  private :store, :fetch, :delete, :delete_if, :keep_if, :merge!, :reject!, :select!, :replace
 
 end

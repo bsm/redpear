@@ -1,3 +1,8 @@
+# == Redpear::Connection
+#
+# Abstract connection class, with support for master/slave sharding.
+# @see Redpear::Connection#initialize for examples
+#
 class Redpear::Connection
 
   MASTER_METHODS = %w|
@@ -37,17 +42,32 @@ class Redpear::Connection
     zrevrange zrevrangebyscore zrevrank zscore
   |.freeze
 
+  # @return [Symbol] ther current connection, either :master or :slave
   attr_reader   :current
   attr_accessor :master, :slave
 
-  # Constructor
-  # @param [Redis::Client|Redis::Namespace|ConnectionPool] master
-  #   The master connection, optional, defaults to the current connection
-  # @param [Redis::Client|Redis::Namespace|ConnectionPool] slave
-  #   The slave connection, optional, defaults to master
+  # Constructor, accepts a master connection and an optional slave connection.
+  # Connections can be instances of Redis::Client, URL strings, or e.g.
+  # ConnectionPool objects. Examples:
+  #
+  #   # Use current redis client as master and slave
+  #   Redpear::Connection.new Redis.current
+  #
+  #   # Use current redis client as slave and a remote URL as master
+  #   Redpear::Connection.new "redis://master.host:6379", Redis.current
+  #
+  #   # Use a connection pool - https://github.com/mperham/connection_pool
+  #   slave_pool = ConnectionPool.new(:size => 5, :timeout => 5) { Redis.connect("redis://slave.host:6379") }
+  #   Redpear::Connection.new "redis://master.host:6379", slave_pool
+  #
+  # @param [Redis::Client|String|ConnectionPool] master
+  #   The master connection, defaults to `Redis.current`
+  # @param [Redis::Client|String|ConnectionPool] slave
+  #   The (optional) slave connection, defaults to master
   def initialize(master = Redis.current, slave = nil)
-    @master = master
-    @slave  = slave || master
+    @master = _connect(master)
+    @slave  = _connect(slave || master)
+    @transaction = nil
   end
 
   # @param [Symbol] name
@@ -61,6 +81,20 @@ class Redpear::Connection
     @current = nil
   end
 
+  # Run a transaction, prevents accidental transaction nesting
+  def transaction(&block)
+    if @transaction
+      yield
+    else
+      begin
+        @transaction = true
+        multi(&block)
+      ensure
+        @transaction = nil
+      end
+    end
+  end
+
   MASTER_METHODS.each do |meth|
     define_method(meth) do |*a, &b|
       (current || master).send(meth, *a, &b)
@@ -72,5 +106,16 @@ class Redpear::Connection
       (current || slave).send(meth, *a, &b)
     end
   end
+
+  private
+
+    def _connect(conn)
+      case conn
+      when String
+        Redis.connect(:url => conn)
+      else
+        conn
+      end
+    end
 
 end

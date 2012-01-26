@@ -1,27 +1,11 @@
 require "redis"
 require "date"
+require "set"
 
 module Redpear
-
-  def self.autoload(const, path = nil)
-    path ||= "redpear/#{const.to_s.downcase}"
-    super const, path
-  end
-
-  autoload :Column
-  autoload :Concern
-  autoload :Connect
-  autoload :Connection
-  autoload :Counters
-  autoload :Expiration
-  autoload :Finders
-  autoload :Index
-  autoload :Model
-  autoload :Namespace
-  autoload :Nest
-  autoload :Persistence
-  autoload :Schema
-  autoload :Store
-  autoload :ZIndex
-
+  autoload :Concern,    "redpear/concern"
+  autoload :Connection, "redpear/connection"
+  autoload :Model,      "redpear/model"
+  autoload :Schema,     "redpear/schema"
+  autoload :Store,      "redpear/store"
 end

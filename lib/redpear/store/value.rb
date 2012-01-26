@@ -1,5 +1,9 @@
 class Redpear::Store::Value < Redpear::Store::Base
 
+  # Deletes the value
+  # @see Redpear::Store::Base#purge!
+  alias_method :delete, :purge!
+
   # @return [String] the value
   def get
     conn.get(key)

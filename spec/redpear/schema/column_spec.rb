@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Redpear::Column do
+describe Redpear::Schema::Column do
 
   subject do
     described_class.new Post, :name
@@ -23,7 +23,6 @@ describe Redpear::Column do
   end
 
   it { should be_a(String) }
-  it { should_not be_index }
 
   it 'should have a name' do
     subject.should == "name"
@@ -77,6 +76,12 @@ describe Redpear::Column do
     timestamp.type_cast(nil).should == nil
     timestamp.type_cast("a").should == nil
     timestamp.type_cast("1313131313").should == Time.at(1313131313)
+  end
+
+  it 'should encode values' do
+    subject.encode_value("123").should == "123"
+    subject.encode_value(123).should == 123
+    subject.encode_value(Time.at(1313131313)).should == 1313131313
   end
 
 end
