@@ -13,10 +13,11 @@ describe Redpear::ZIndex do
   end
 
   it 'should return members for a value' do
-    subject.members(123).should be_instance_of(Redpear::ZMembers)
+    subject.members(123).key.should == "posts:[user_id]:123"
+    subject.members(123).should be_instance_of(Redpear::Store::SortedSet)
     subject.members(123).should == []
-    subject.nest(123).zadd 1, "A"
-    subject.members(123).should == ["A"]
+    subject.members(123).add "A", 1
+    subject.members(123).should == [["A", 1]]
   end
 
 end

@@ -1,12 +1,21 @@
-class Redpear::Store::SortedSet < Redpear::Store::Base
+class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   include Enumerable
 
   # @yield over a field-score pair
   # @yieldparam [String] field
   # @yieldparam [String] score
   def each(&block)
-    slice(0..-1).each(&block)
+    all.each(&block)
   end
+
+  # @param [Hash] options
+  # @option [Boolean] with_scores
+  #   Return with scores, defaults to true
+  # @return [Array] all elements
+  def all(options = {})
+    slice(0..-1, options)
+  end
+  alias_method :to_a, :all
 
   # @return [Integer] the number of items in the set
   def length
@@ -20,48 +29,48 @@ class Redpear::Store::SortedSet < Redpear::Store::Base
     conn.zcount key, *range_pair(range)
   end
 
-  # Adds a single value.
-  # @param [String] value
-  #   A value to add
+  # Adds a single member.
+  # @param [String] member
+  #   A member to add
   # @param [Integer] score
   #   The score
-  def add(value, score)
-    conn.zadd key, score, value
+  def add(member, score)
+    conn.zadd key, score, member
     self
   end
   alias_method :[]=, :add
 
-  # Determines the score of a value
-  # @param [String] value
-  # @return [Integer] the score for the given `value`
-  def score(value)
-    number = conn.zscore(key, value)
+  # Determines the score of a member
+  # @param [String] member
+  # @return [Integer] the score for the given `member`
+  def score(member)
+    number = conn.zscore(key, member)
     number.to_i if number
   end
   alias_method :[], :score
 
-  # Determines the index of a value (based on ascending scores)
-  # @param [String] value
-  # @return [Integer] the index for the given `value`
-  def index(value)
-    number = conn.zrank(key, value)
+  # Determines the index of a member (based on ascending scores)
+  # @param [String] member
+  # @return [Integer] the index for the given `member`
+  def index(member)
+    number = conn.zrank(key, member)
     number.to_i if number
   end
   alias_method :rank, :index
 
-  # Determines the reverse index of a value (based on descending scores)
-  # @param [String] value
-  # @return [Integer] the index for the given `value`
-  def rindex(value)
-    number = conn.zrevrank(key, value)
+  # Determines the reverse index of a member (based on descending scores)
+  # @param [String] member
+  # @return [Integer] the index for the given `member`
+  def rindex(member)
+    number = conn.zrevrank(key, member)
     number.to_i if number
   end
   alias_method :rrank, :rindex
 
-  # @param [String] value
-  #   A value to delete
-  def delete(value)
-    conn.zrem key, value
+  # @param [String] member
+  #   The `member` to delete
+  def delete(member)
+    conn.zrem key, member
   end
 
   # @return [Array] empty array
@@ -70,9 +79,9 @@ class Redpear::Store::SortedSet < Redpear::Store::Base
     []
   end
 
-  # @return [Boolean] true, if value is included
-  def include?(value)
-    !!conn.zscore(key, value)
+  # @return [Boolean] true, if member is included
+  def include?(member)
+    !!conn.zscore(key, member)
   end
   alias_method :member?, :include?
 
@@ -81,26 +90,26 @@ class Redpear::Store::SortedSet < Redpear::Store::Base
     length.zero?
   end
 
-  # Returns a slice of members between index +range+, with the lower ranks returned first
+  # Returns a slice of members between index +range+, with the lower index returned first
   # @param [Range] range
   #   The index range of the elements
   # @param [Hash] options
   # @option [Boolean] with_scores
   #   Return with scores, defaults to true
-  # @return [Enumerator] the value-score pairs
+  # @return [Array] the members
   def slice(range, options = {})
     start, finish = range_pair(range)
     fetch_range :zrange, start, finish, options
   end
   alias_method :top, :slice
 
-  # Returns a slice of members between rindex +range+, with the higher ranks returned first
+  # Returns a slice of members between rindex +range+, with the higher index returned first
   # @param [Range] range
   #   The rindex range of the elements
   # @param [Hash] options
   # @option [Boolean] with_scores
   #   Return with scores, defaults to true
-  # @return [Enumerator]
+  # @return [Array] the members
   def rslice(range, options = {})
     start, finish = range_pair(range)
     fetch_range :zrevrange, start, finish, options
@@ -115,7 +124,7 @@ class Redpear::Store::SortedSet < Redpear::Store::Base
   #   Return with scores, defaults to true
   # @option [Integer] limit
   #   Limit the results
-  # @return [Enumerator]
+  # @return [Array] the members
   def select(range, options = {})
     start, finish = range_pair(range)
     fetch_range :zrangebyscore, start, finish, options
@@ -129,7 +138,7 @@ class Redpear::Store::SortedSet < Redpear::Store::Base
   #   Return with scores, defaults to true
   # @option [Integer] limit
   #   Limit the results
-  # @return [Enumerator]
+  # @return [Array] the members
   def rselect(range, options = {})
     start, finish = range_pair(range)
     fetch_range :zrevrangebyscore, finish, start, options
@@ -142,17 +151,17 @@ class Redpear::Store::SortedSet < Redpear::Store::Base
   end
 
   # @param [Integer] index
-  # @return [String] value for given `index`.
+  # @return [String] member for given `index`.
   def at(index)
     slice(index..index, :with_scores => false).first
   end
 
-  # @return [String] value with the lowest score
+  # @return [String] member with the lowest index
   def first(count = 0)
     count > 0 ? slice(0..(count-1), :with_scores => false).to_a : at(0)
   end
 
-  # @return [String] value with the highest score
+  # @return [String] member with the highest index
   def last(count = 0)
     count > 0 ? slice(-count..-1, :with_scores => false).to_a : at(-1)
   end
@@ -187,13 +196,29 @@ class Redpear::Store::SortedSet < Redpear::Store::Base
     self.class.new target.to_s, conn
   end
 
+  # @param [String] member
+  #   The member to increment
+  # @param [Integer] by
+  #   The increment, defaults to 1
+  def increment(member, by = 1)
+    conn.zincrby(key, by, member).to_i
+  end
+
+  # @param [String] member
+  #   The member to decrement
+  # @param [Integer] by
+  #   The decrement, defaults to 1
+  def decrement(member, by = 1)
+    increment member, -by
+  end
+
   private
 
     def fetch_range(method, start, finish, options = {})
-      options[:limit] = [options[:offset] || 0, options[:limit]] if options[:offset] || options[:limit]
+      options[:limit]       = [options[:offset] || 0, options[:limit]] if options[:offset] || options[:limit]
       options[:with_scores] = true unless options.key?(:with_scores)
       result = conn.send method, key, start, finish, options
-      options[:with_scores] ? result.each_slice(2) : result.each
+      options[:with_scores] ? result.each_slice(2).map {|m,s| [m, s.to_i] } : result
     end
 
 end

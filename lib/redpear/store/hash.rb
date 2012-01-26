@@ -1,5 +1,4 @@
-class Redpear::Store::Hash < Redpear::Store::Base
-  include Enumerable
+class Redpear::Store::Hash < Redpear::Store::Enumerable
 
   # @yield over a field-value pair
   # @yieldparam [String] field
@@ -13,6 +12,7 @@ class Redpear::Store::Hash < Redpear::Store::Base
     conn.hgetall(key) || {}
   end
   alias_method :to_hash, :all
+  alias_method :value, :all
 
   # @param [String] field
   #   The field to delete
@@ -81,6 +81,14 @@ class Redpear::Store::Hash < Redpear::Store::Base
   #   The increment value, defaults to 1
   def increment(field, value = 1)
     conn.hincrby key, field, value
+  end
+
+  # @param [String] field
+  #   The field to decrement
+  # @param [Integer] value
+  #   The decrement value, defaults to 1
+  def decrement(field, value = 1)
+    increment(field, -value)
   end
 
   # @param [multiple] fields

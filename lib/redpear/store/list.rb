@@ -1,5 +1,4 @@
-class Redpear::Store::List < Redpear::Store::Base
-  include Enumerable
+class Redpear::Store::List < Redpear::Store::Enumerable
 
   # @yield over each item in the list
   # @yieldparam [String] item

@@ -43,6 +43,16 @@ class Redpear::Model < Hash
       @connection ||= (superclass.respond_to?(:connection) ? superclass.connection : Redpear::Connection.new)
     end
 
+    # @return [Redpear::Store::Set] the IDs of all existing records
+    def members
+      @_members ||= Redpear::Store::Set.new [scope, "[~]"].join(':'), connection
+    end
+
+    # @return [Redpear::Store::Value] the generator of primary keys
+    def pk_generator
+      @_pk_generator ||= Redpear::Store::Value.new [scope, "[+]"].join(':'), connection
+    end
+
   end
 
   # Ensure we can read raw level values

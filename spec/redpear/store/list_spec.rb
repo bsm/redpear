@@ -10,8 +10,7 @@ describe Redpear::Store::List do
     described_class.new 'other', connection
   end
 
-  it { should be_a(Enumerable) }
-  it { should be_a(Redpear::Store::Base) }
+  it { should be_a(Redpear::Store::Enumerable) }
 
   it 'should return all items' do
     subject.all.should == []

@@ -13,6 +13,16 @@ class Redpear::Store::Base
 
   alias to_s key
 
+  # @return [String] custom inspect
+  def inspect
+    "#<#{self.class.name} #{key}: #{value.inspect}>"
+  end
+
+  # @abstract, override in subclasses
+  def value
+    nil
+  end
+
   private
 
     def range_pair(range)

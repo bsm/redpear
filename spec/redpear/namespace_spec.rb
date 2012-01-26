@@ -14,16 +14,6 @@ describe Redpear::Namespace do
       subject.class.namespace.connection.should be(Post.connection)
     end
 
-    it 'should have a members nest' do
-      subject.class.mb_nest.should be_instance_of(Redpear::Nest)
-      subject.class.mb_nest.should == "posts:[~]"
-    end
-
-    it 'should have a PK nest' do
-      subject.class.pk_nest.should be_instance_of(Redpear::Nest)
-      subject.class.pk_nest.should == "posts:[+]"
-    end
-
     it 'should have a scope' do
       subject.class.scope.should == "posts"
     end

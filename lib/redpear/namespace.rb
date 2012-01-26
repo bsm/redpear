@@ -12,14 +12,6 @@
 #   instance.nest                 # => 'comments:1'
 #   instance.nest.hgetall         # => { "post_id" => "2" }
 #
-#   # Member nesting
-#   Comment.mb_nest               # "comments:[~]"
-#   Comment.mb_nest.smembers      # => #<Set: {1}>
-#
-#   # PK nesting
-#   Comment.pk_nest               # "comments:[+]"
-#   Comment.pk_nest.get           # 1 = last ID
-#
 #   # Index nesting
 #   Comment.columns["post_id"].nest(2) # "comments:post_id:2"
 #   Comment.columns["post_id"].nest(2).smembers # #<Set: {1}>
@@ -44,25 +36,6 @@ module Redpear::Namespace
     # Override if you want to use a differnet scope schema.
     def scope
       @scope ||= "#{name.split('::').last.downcase}s"
-    end
-
-    # @return [Redpear::Nest] the nest for the members store. Example:
-    #
-    #   Comment.mb_nest # => 'comments:*'
-    #   Comment.mb_nest.smembers # => [1, 2, 3]
-    #
-    def mb_nest
-      @mb_nest ||= namespace["[~]"]
-    end
-
-    # @return [Redpear::Nest] the nest for the primary-key incrementor. Example:
-    #
-    #   Comment.pk_nest # => 'comments:+'
-    #   Comment.pk_nest.get # => 0
-    #   Comment.pk_nest.incr # => 1
-    #
-    def pk_nest
-      @pk_nest ||= namespace["[+]"]
     end
 
   end

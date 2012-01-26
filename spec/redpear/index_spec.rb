@@ -9,22 +9,13 @@ describe Redpear::Index do
   it { should be_a(Redpear::Column) }
   it { should be_index }
 
-  it 'should have a namespace' do
-    subject.namespace.should == "comments:[post_id]"
-  end
-
-  it 'should build nests by values' do
-    subject.nest(nil).should == "comments:[post_id]:_"
-    subject.nest("").should == "comments:[post_id]:_"
-    subject.nest(123).should == "comments:[post_id]:123"
-  end
-
   it 'should return members for a value' do
-    subject.members(nil).should == []
+    subject.members(123).key.should == "comments:[post_id]:123"
+    subject.members(123).should be_instance_of(Redpear::Store::Set)
     subject.members(123).should == []
-    subject.nest(123).sadd 1
+    subject.members(123).add 1
     subject.members(123).should == ["1"]
-    subject.members(123).should be_instance_of(Redpear::Members)
+    subject.members(nil).should == []
   end
 
 end

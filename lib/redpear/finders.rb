@@ -3,14 +3,9 @@ module Redpear::Finders
 
   module ClassMethods
 
-    # @return [Array] the IDs of all existing records
-    def members
-      Redpear::Members.new(mb_nest)
-    end
-
     # @return [Integer] the number of total records
     def count
-      members.count
+      members.size
     end
 
     # @return [Array] all records
@@ -38,7 +33,7 @@ module Redpear::Finders
         record.refresh_attributes if options[:lazy] == false
         record
       else                          # Must be an expired or orphaned one
-        record.destroy              # Destroy (removes from mb_nest set)
+        record.destroy              # Destroy
         nil
       end
     end

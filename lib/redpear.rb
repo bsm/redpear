@@ -16,7 +16,6 @@ module Redpear
   autoload :Expiration
   autoload :Finders
   autoload :Index
-  autoload :Members
   autoload :Model
   autoload :Namespace
   autoload :Nest
@@ -24,6 +23,5 @@ module Redpear
   autoload :Schema
   autoload :Store
   autoload :ZIndex
-  autoload :ZMembers
 
 end

@@ -1,6 +1,6 @@
 require 'set'
 
-class Redpear::Store::Set < Redpear::Store::Base
+class Redpear::Store::Set < Redpear::Store::Enumerable
   include Enumerable
 
   # @yield over a field-value pair
@@ -43,6 +43,7 @@ class Redpear::Store::Set < Redpear::Store::Base
   def delete(value)
     conn.srem key, value
   end
+  alias_method :remove, :delete
 
   # @return [Array] empty array
   def clear

@@ -6,8 +6,7 @@ describe Redpear::Store::Hash do
     described_class.new "hkey", connection
   end
 
-  it { should be_a(Enumerable) }
-  it { should be_a(Redpear::Store::Base) }
+  it { should be_a(Redpear::Store::Enumerable) }
 
   it 'should return all pairs' do
     subject.all.should == {}
@@ -76,6 +75,13 @@ describe Redpear::Store::Hash do
     subject['a'].should == '6'
   end
 
+  it 'should decrement values' do
+    subject.increment('a', 5).should == 5
+    subject.decrement('a').should == 4
+    subject.decrement('a', 2).should == 2
+    subject['a'].should == '2'
+  end
+
   it 'should return all keys' do
     subject.keys.should == []
     subject.store('a', 'b')
@@ -110,6 +116,12 @@ describe Redpear::Store::Hash do
     subject.store('c', 'd')
     subject.to_hash.should == {'a' => 'b', 'c' => 'd'}
     subject.update('c' => 'x', 'e' => 'f').should == {'a' => 'b', 'c' => 'x', 'e' => 'f'}
+  end
+
+  it 'should have a custom inspect' do
+    subject.inspect.should == %(#<Redpear::Store::Hash hkey: {}>)
+    subject.update('a' => 'b')
+    subject.inspect.should == %(#<Redpear::Store::Hash hkey: {"a"=>"b"}>)
   end
 
 end

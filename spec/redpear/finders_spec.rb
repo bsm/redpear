@@ -14,11 +14,6 @@ describe Redpear::Finders do
 
   it { subject.should be_a(described_class) }
 
-  it 'should retrieve members' do
-    subject.class.members.should be_instance_of(Redpear::Members)
-    subject.class.members.to_a.should =~ ["1", "2", "3"]
-  end
-
   it 'should have a count' do
     subject.class.count.should == 3
   end

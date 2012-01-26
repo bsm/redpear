@@ -27,11 +27,6 @@ module Redpear::Persistence
       new('id' => id).tap(&:destroy)
     end
 
-    # Generates the next ID
-    def next_id
-      pk_nest.incr.to_s
-    end
-
   end
 
   # Returns true for new records
@@ -65,11 +60,11 @@ module Redpear::Persistence
   # @return [Redpear::Model] the saved record
   def save(options = {}, &block)
     before_save
-    update "id" => self.class.next_id unless persisted?
+    update "id" => self.class.pk_generator.next.to_s unless persisted?
 
     transaction do
       nest.mapped_hmset __persistable_attributes__
-      __relevant_member_sets__.each {|s| s.add(self) }
+      __relevant_member_sets__.each {|s| s.add(id) }
       expire options[:expire]
       yield(self) if block
     end
@@ -86,7 +81,7 @@ module Redpear::Persistence
 
     transaction do
       nest.del
-      __relevant_member_sets__.each {|s| s.remove(self) }
+      __relevant_member_sets__.each {|s| s.delete(id) }
     end
 
     true

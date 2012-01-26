@@ -15,7 +15,7 @@ describe Redpear::Model do
     end
 
     it 'can have a custom' do
-      Manager.connection.should be_a(ManagerConnection)
+      Manager.connection.should be_instance_of(ManagerConnection)
     end
 
     it 'should be inheritable' do
@@ -28,6 +28,19 @@ describe Redpear::Model do
 
   end
 
+  describe "model" do
+
+    it 'should have members' do
+      subject.class.members.should be_instance_of(Redpear::Store::Set)
+      subject.class.members.should == []
+    end
+
+    it 'should have a PK generator' do
+      subject.class.pk_generator.should be_instance_of(Redpear::Store::Value)
+      subject.class.pk_generator.next.should == 1
+    end
+
+  end
 
   it 'should initialize with attributes' do
     described_class.new(:id => 1).should == { "id" => "1" }

@@ -20,7 +20,7 @@ class Redpear::ZIndex < Redpear::Index
   #   the index value
   # @return [Redpear::SortedMembers] the IDs of all existing records for a given index value
   def members(value)
-    Redpear::ZMembers.new nest(value), callback
+    Redpear::Store::SortedSet.new [model.scope, "[#{to_s}]", value].join(':'), model.connection
   end
 
 end

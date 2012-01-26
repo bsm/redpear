@@ -10,20 +10,20 @@ describe Redpear::Store::SortedSet do
     described_class.new "other", connection
   end
 
-  it { should be_a(Enumerable) }
-  it { should be_a(Redpear::Store::Base) }
+  it { should be_a(Redpear::Store::Enumerable) }
 
   it 'should return all members' do
     subject.to_a.should  == []
     subject.add('a', 1)
-    subject.to_a.should == [['a', '1']]
+    subject.to_a.should == [['a', 1]]
+    subject.to_a(:with_scores => false).should == ['a']
   end
 
   it 'should yield all each member' do
     subject.add('a', 1)
     yielded = []
     subject.each {|v, s| yielded << [v, s] }
-    yielded.should == [['a', '1']]
+    yielded.should == [['a', 1]]
   end
 
   it 'should return the length' do
@@ -77,8 +77,8 @@ describe Redpear::Store::SortedSet do
   it 'should be comparable' do
     subject.add('a', 1)
     subject.add('b', 2)
-    subject.should == [['a', '1'], ['b', '2']]
-    subject.should == { 'a' => '1', 'b' => '2' }
+    subject.should == [['a', 1], ['b', 2]]
+    subject.should == { 'a' => 1, 'b' => 2 }
   end
 
   it 'should return scores for values' do
@@ -103,18 +103,18 @@ describe Redpear::Store::SortedSet do
     subject.add('a', 30)
     subject.add('b', 20)
     subject.add('c', 10)
-    subject.top(1..-1).should be_a(Enumerator)
-    subject.top(1..-1).to_a.should == [['b', '20'], ['a', '30']]
-    subject.bottom(1..-1).to_a.should == [['b', '20'], ['c', '10']]
+    subject.top(1..-1).should be_instance_of(Array)
+    subject.top(1..-1).to_a.should == [['b', 20], ['a', 30]]
+    subject.bottom(1..-1).to_a.should == [['b', 20], ['c', 10]]
   end
 
   it 'should select values between scores' do
     subject.add('a', 30)
     subject.add('b', 20)
     subject.add('c', 10)
-    subject.select(5..25).should be_a(Enumerator)
-    subject.select(5..25).to_a.should == [['c', '10'], ['b', '20']]
-    subject.rselect(5..25).to_a.should == [['b', '20'], ['c', '10']]
+    subject.select(5..25).should be_instance_of(Array)
+    subject.select(5..25).to_a.should == [['c', 10], ['b', 20]]
+    subject.rselect(5..25).to_a.should == [['b', 20], ['c', 10]]
     subject.select(5..25, :with_scores => false, :limit => 1).to_a.should == ['c']
   end
 
@@ -144,7 +144,7 @@ describe Redpear::Store::SortedSet do
     result = subject.unionstore('target', other, :aggregate => :sum)
     result.should be_a(described_class)
     result.key.should == "target"
-    result.should == [["d", "5"], ["c", "10"], ["b", "20"], ["a", "70"]]
+    result.should == [["d", 5], ["c", 10], ["b", 20], ["a", 70]]
   end
 
   it 'should build intersections and store results' do
@@ -154,7 +154,23 @@ describe Redpear::Store::SortedSet do
     result = subject.interstore('target', other, :aggregate => :max)
     result.should be_a(described_class)
     result.key.should == "target"
-    result.should == [["a", "40"]]
+    result.should == [["a", 40]]
+  end
+
+  it 'should increment values' do
+    subject.add('a', 30)
+    subject.increment('a').should == 31
+    subject['a'].should == 31
+    subject.increment('a', 5).should == 36
+    subject['a'].should == 36
+  end
+
+  it 'should decrement values' do
+    subject.increment('a', 5).should == 5
+    subject['a'].should == 5
+    subject.decrement('a').should == 4
+    subject.decrement('a', 2).should == 2
+    subject['a'].should == 2
   end
 
 end
