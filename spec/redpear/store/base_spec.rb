@@ -3,18 +3,18 @@ require 'spec_helper'
 describe Redpear::Store::Base do
 
   subject do
-    described_class.new "bkey", connection
+    described_class.new "base:key", connection
   end
 
   let :record do
-    Redpear::Store::Value.new 'vkey', connection
+    Redpear::Store::Value.new 'value:key', connection
   end
 
   its(:value) { should be_nil }
 
   it 'should have a key' do
-    subject.key.should == "bkey"
-    subject.to_s.should == "bkey"
+    subject.key.should == "base:key"
+    subject.to_s.should == "base:key"
   end
 
   it 'should have a connection' do
@@ -22,7 +22,7 @@ describe Redpear::Store::Base do
   end
 
   it 'should have a custom inspect' do
-    subject.inspect.should == %(#<Redpear::Store::Base bkey: nil>)
+    subject.inspect.should == %(#<Redpear::Store::Base base:key: nil>)
   end
 
   it 'should have a ttl' do
@@ -71,6 +71,13 @@ describe Redpear::Store::Base do
     record.exists?.should be(true)
     record.purge!
     record.exists?.should be(false)
+  end
+
+  it 'should return type information' do
+    subject.type.should == :none
+    record.type.should == :none
+    record.set 'abcd'
+    record.type.should == :string
   end
 
 end

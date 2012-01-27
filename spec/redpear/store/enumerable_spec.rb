@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Redpear::Store::Enumerable do
 
   subject do
-    Redpear::Store::List.new('lkey', connection)
+    Redpear::Store::List.new('enum:key', connection)
   end
 
   it { should be_a(Redpear::Store::Base) }
@@ -12,7 +12,7 @@ describe Redpear::Store::Enumerable do
 
   it 'should have a custom inspect' do
     subject << 'a' << 'b' << 'c'
-    subject.inspect.should == %(#<Redpear::Store::List lkey: ["a", "b", "c"]>)
+    subject.inspect.should == %(#<Redpear::Store::List enum:key: ["a", "b", "c"]>)
   end
 
   it 'should have a #delete_all alias' do

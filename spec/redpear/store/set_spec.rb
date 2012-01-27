@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Redpear::Store::Set do
 
   subject do
-    described_class.new "skey", connection
+    described_class.new "set:key", connection
   end
 
   let :other do

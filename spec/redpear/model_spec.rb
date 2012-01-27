@@ -31,7 +31,7 @@ describe Redpear::Model do
     end
 
     it 'should have a PK counter' do
-      subject.pk_counter.should be_instance_of(Redpear::Store::Value)
+      subject.pk_counter.should be_instance_of(Redpear::Store::Counter)
       subject.pk_counter.next.should == 1
     end
 
@@ -53,7 +53,7 @@ describe Redpear::Model do
         subject.pk_counter.next
         subject.pk_counter.next
       end
-      subject.pk_counter.value.should == "3"
+      subject.pk_counter.should == 3
 
       Post.transaction do
         Post.new :id => 1, :title => "A", :rank => 1, :user_id => 1
@@ -133,7 +133,7 @@ describe Redpear::Model do
   describe "initialization" do
 
     it 'should initialize with ID' do
-      subject.should == { 'id' => described_class.pk_counter.value }
+      subject.should == { 'id' => described_class.pk_counter.value.to_s }
     end
 
     it 'should initialize with custom ID' do

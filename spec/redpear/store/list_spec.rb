@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Redpear::Store::List do
 
   subject do
-    described_class.new "lkey", connection
+    described_class.new "list:key", connection
   end
 
   let :other do

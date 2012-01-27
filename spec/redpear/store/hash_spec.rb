@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Redpear::Store::Hash do
 
   subject do
-    described_class.new "hkey", connection
+    described_class.new "hash:key", connection
   end
 
   it { should be_a(Redpear::Store::Enumerable) }
@@ -119,9 +119,9 @@ describe Redpear::Store::Hash do
   end
 
   it 'should have a custom inspect' do
-    subject.inspect.should == %(#<Redpear::Store::Hash hkey: {}>)
+    subject.inspect.should == %(#<Redpear::Store::Hash hash:key: {}>)
     subject.update('a' => 'b')
-    subject.inspect.should == %(#<Redpear::Store::Hash hkey: {"a"=>"b"}>)
+    subject.inspect.should == %(#<Redpear::Store::Hash hash:key: {"a"=>"b"}>)
   end
 
 end

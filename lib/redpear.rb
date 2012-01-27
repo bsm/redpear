@@ -1,6 +1,7 @@
 require "redis"
 require "date"
 require "set"
+require "securerandom"
 
 module Redpear
   autoload :Concern,    "redpear/concern"

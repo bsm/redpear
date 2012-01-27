@@ -8,41 +8,36 @@ class Redpear::Store::Value < Redpear::Store::Base
   def get
     conn.get(key)
   end
-  alias_method :value, :get
+
+  # @see #get
+  def value
+    get
+  end
 
   # Sets the value
   # @param [String] the value to set
   def set(value)
     conn.set(key, value)
   end
-  alias_method :value=, :set
 
-  # Increments the value
-  # @param [Integer] by
-  #   The increment, defaults to 1
-  def increment(by = 1)
-    case by
-    when 1
-      conn.incr(key)
-    else
-      conn.incrby(key, by)
-    end
+  # @see #set
+  def value=(*a)
+    set(*a)
   end
-  alias_method :next, :increment
 
-  # Decrements the value
-  # @param [Integer] by
-  #   The decrement, defaults to 1
-  def decrement(by = 1)
-    case by
-    when 1
-      conn.decr(key)
-    else
-      conn.decrby(key, by)
-    end
+  # @see #set
+  def replace(*a)
+    set(*a)
   end
-  alias_method :previous, :decrement
-  alias_method :prev, :decrement
+
+  # Appends a `value`
+  # @param [Integer] value
+  #   The value to append
+  def append(value)
+    conn.append(key, value)
+    self
+  end
+  alias_method :<<, :append
 
   # Comparator
   # @param [String] other
@@ -58,13 +53,14 @@ class Redpear::Store::Value < Redpear::Store::Base
 
   # @return [Boolean] true, if responds to `method`
   def respond_to?(method, *a)
-    super || value.respond_to?(method, *a)
+    super || (value || "").respond_to?(method, *a)
   end
 
   protected
 
     def method_missing(method, *a, &b)
-      value.respond_to?(method) ? value.send(method, *a, &b) : super
+      base = (value || "")
+      base.respond_to?(method) ? base.send(method, *a, &b) : super
     end
 
 end

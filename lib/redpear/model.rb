@@ -55,9 +55,9 @@ class Redpear::Model < Hash
       @_members ||= Redpear::Store::Set.new scoped("~"), connection
     end
 
-    # @return [Redpear::Store::Value] the generator of primary keys
+    # @return [Redpear::Store::Counter] the generator of primary keys
     def pk_counter
-      @_pk_counter ||= Redpear::Store::Value.new scoped("+"), connection
+      @_pk_counter ||= Redpear::Store::Counter.new scoped("+"), connection
     end
 
     # Runs a bulk-operation.

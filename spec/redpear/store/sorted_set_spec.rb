@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Redpear::Store::SortedSet do
 
   subject do
-    described_class.new "zkey", connection
+    described_class.new "zset:key", connection
   end
 
   let :other do

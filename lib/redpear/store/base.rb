@@ -29,6 +29,11 @@ class Redpear::Store::Base
     value if value > -1
   end
 
+  # @return [String] type information for this record
+  def type
+    conn.type(key).to_sym
+  end
+
   # Expires the record
   # @overload expire(time)
   #   @param [Time] time The time to expire the record at
