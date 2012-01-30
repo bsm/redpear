@@ -15,10 +15,9 @@ describe Redpear::Store::Enumerable do
     subject.inspect.should == %(#<Redpear::Store::List enum:key: ["a", "b", "c"]>)
   end
 
-  it 'should have a #delete_all alias' do
+  it 'should have a #clear alias' do
     subject << 'a' << 'b' << 'c'
-    subject.exists?.should be(true)
-    subject.delete_all
+    subject.clear.should == []
     subject.exists?.should be(false)
   end
 

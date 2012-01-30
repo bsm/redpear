@@ -21,6 +21,10 @@ describe Redpear::Store::Set do
     subject.to_a.should == ['a']
   end
 
+  it 'should have a value' do
+    subject.value.should == subject.all
+  end
+
   it 'should return the length' do
     subject.length.should == 0
     subject.add('a')
@@ -38,13 +42,6 @@ describe Redpear::Store::Set do
     subject.add('a')
     subject.length.should == 1
     subject.delete('a')
-    subject.length.should == 0
-  end
-
-  it 'should clear all values' do
-    subject.add('a')
-    subject.length.should == 1
-    subject.clear.should == []
     subject.length.should == 0
   end
 

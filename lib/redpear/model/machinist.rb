@@ -1,22 +1,22 @@
-require 'redpear'
 require 'machinist'
+require 'redpear/model'
 
 # Machinist module for your tests/specs. Example:
 #
 #   # spec/support/blueprints.rb
-#   require "redpear/machinist"
+#   require "redpear/model/machinist"
 #
 #   Post.blueprint do
 #     title      { "A Title" }
 #     created_at { 2.days.ago }
 #   end
 #
-module Redpear::Machinist
+module Redpear::Model::Machinist
 
   class Blueprint < Machinist::Blueprint
 
     def make!(attributes = {})
-      make(attributes).tap &:save
+      make(attributes)
     end
 
     def lathe_class #:nodoc:
@@ -43,9 +43,9 @@ module Redpear::Machinist
 end
 
 class Redpear::Model #:nodoc:
-  extend Machinist::Machinable
+  extend ::Machinist::Machinable
 
   def self.blueprint_class
-    Redpear::Machinist::Blueprint
+    self::Machinist::Blueprint
   end
 end

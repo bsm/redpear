@@ -69,7 +69,15 @@ describe Redpear::Store::Base do
   it 'should allow purging records' do
     record.set 'abcd'
     record.exists?.should be(true)
-    record.purge!
+    record.purge!.should be(true)
+    record.purge!.should be(false)
+    record.exists?.should be(false)
+  end
+
+  it 'should allow clearing records' do
+    record.set 'abcd'
+    record.exists?.should be(true)
+    record.clear.should be_nil
     record.exists?.should be(false)
   end
 

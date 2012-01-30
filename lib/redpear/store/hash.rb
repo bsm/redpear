@@ -33,13 +33,6 @@ class Redpear::Store::Hash < Redpear::Store::Enumerable
     length.zero?
   end
 
-  # Clears the hash
-  # @return [Hash] empty hash
-  def clear
-    conn.del key
-    {}
-  end
-
   # @param [String] field
   #   The field to fetch
   # @return [String] value stored in +field+

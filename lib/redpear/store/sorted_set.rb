@@ -73,12 +73,6 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
     conn.zrem key, member
   end
 
-  # @return [Array] empty array
-  def clear
-    conn.zremrangebyrank key, 0, -1
-    []
-  end
-
   # @return [Boolean] true, if member is included
   def include?(member)
     !!conn.zscore(key, member)

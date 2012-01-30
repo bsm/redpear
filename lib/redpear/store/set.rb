@@ -13,6 +13,7 @@ class Redpear::Store::Set < Redpear::Store::Enumerable
     members.to_set
   end
   alias_method :to_set, :all
+  alias_method :value, :all
 
   # @return [Array] the array of members
   def members
@@ -42,12 +43,6 @@ class Redpear::Store::Set < Redpear::Store::Enumerable
     conn.srem key, value
   end
   alias_method :remove, :delete
-
-  # @return [Array] empty array
-  def clear
-    conn.del(key)
-    []
-  end
 
   # @return [Boolean] true, if value is included
   def include?(value)

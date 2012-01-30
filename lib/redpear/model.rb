@@ -1,3 +1,5 @@
+require 'redpear'
+
 =begin
 Redis is a simple key/value store, hence storing structured data can be a
 challenge. Redpear::Model allows you to store/find/associate "records" in a Redis
@@ -19,6 +21,7 @@ Redpear::Model is VERY lightweight. It is optimised for raw speed at the
 expense of convenience.
 =end
 class Redpear::Model < Hash
+  autoload :Machinist, 'redpear/model/machinist'
   include Redpear::Schema
 
   class << self

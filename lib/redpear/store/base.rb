@@ -55,7 +55,13 @@ class Redpear::Store::Base
 
   # Deletes the whole record
   def purge!
-    conn.del key
+    conn.del(key) == 1
+  end
+
+  # Deletes the record and returns the value
+  def clear
+    purge!
+    value
   end
 
   # Expires the record

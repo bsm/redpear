@@ -3,79 +3,78 @@ require 'spec_helper'
 describe Redpear::Store::Lock do
 
   subject do
-    described_class.new('lock:key', connection)
-  end
-
-  let :lock do
-    Redpear::Store::Value.new('lock:key', connection)
+    described_class.new 'lock:key', connection
   end
 
   let :value do
-    Redpear::Store::Value.new('value:key', connection)
+    Redpear::Store::Value.new 'value:key', connection
   end
 
   before do
     subject.stub! :sleep
   end
 
+  def set_current(offset = 0)
+    connection.set subject.key, (Time.now + offset).to_f
+  end
+
   it { should be_a(Redpear::Store::Base) }
 
-  it 'should have a locked indicator' do
-    subject.should_not be_locked
+  describe "if empty" do
+    it { should_not be_exists }
+    its(:value) { should be_nil }
+    its(:current) { should be_instance_of(Float) }
+    its(:current) { should == 0.0 }
+  end
+
+  describe "if set" do
+    before { set_current(60) }
+
+    it { should be_exists }
+    its(:value) { should be_instance_of(String) }
+    its(:current) { should be_instance_of(Float) }
+    its(:current) { should > Time.now.to_f }
+  end
+
+  it 'should lock with a timestamp and remove it on release' do
+    subject.should_not_receive(:sleep)
+    subject.exists?.should be(false)
     subject.lock do
-      subject.should be_locked
+      value.set "true"
+      subject.exists?.should be(true)
+      subject.current.should > Time.now.to_f
+      subject.current.should < (Time.now.to_f + 3)
     end
-    subject.should_not be_locked
+    value.get.should == "true"
+    subject.exists?.should be(false)
+  end
+
+  it 'should not remove timestamp of task took longer than anticipated' do
+    ts = Time.now
+    subject.lock :lock_timeout => ts do
+      subject.current.should == ts.to_f
+    end
+    subject.current.should == ts.to_f
+  end
+
+  it 'should wait for lock if locked by another process' do
+    subject.should_receive(:sleep).at_least(:once)
+    set_current(0.01)
+    subject.lock {}
+  end
+
+  it 'should timeout if waiting for lock takes too long' do
+    set_current(0.01)
+    lambda {
+      subject.lock(:wait_timeout => 0) {}
+    }.should raise_error(described_class::LockTimeout)
   end
 
   it 'should expire orphaned locks' do
-    lock.value = "anything"
-    subject.lock do
-      value.set "x"
-    end
-    value.should == "x"
-    lock.value.should be_nil
-  end
-
-  it 'should expire orphaned locks' do
-    lock.value = "anything"
-    subject.lock do
-      value.set "x"
-    end
-    value.should == "x"
-    lock.value.should be_nil
-  end
-
-  it 'should use random/unique lock values' do
-    subject.lock do
-      lock.value.should match(/\A[a-f0-9]{32}\z/)
-    end
-  end
-
-  it 'should wait if already locked' do
-    thread = Thread.new do
-      subject.lock { sleep 0.01; value.set "A" }
-    end
-    sleep(0.001) until subject.locked?
-
-    value.should be_nil
-    subject.should be_locked
-    subject.lock do
-      value.should == "A"
-    end
-    thread.join
-  end
-
-  it 'should raise an error when lock cannot be acquired in time' do
-    lambda do
-      subject.lock(:wait => (Time.now - 1)) {}
-    end.should raise_error(described_class::LockTimeout)
-  end
-
-  it 'should raise an error when lock is lost' do
-    lambda do
-      subject.lock { lock.value = "broken" }
-    end.should raise_error(described_class::UnlockError)
+    subject.should_not_receive(:sleep)
+    set_current(-5)
+    subject.lock { value.set "true" }
+    value.get.should == "true"
   end
 
 end
