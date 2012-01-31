@@ -4,6 +4,8 @@ require 'bundler/setup'
 require 'rspec'
 require 'redpear'
 require 'support/models'
+require 'support/blueprints'
+require 'support/factories'
 
 count = Redis.current.keys.size
 unless count.zero?

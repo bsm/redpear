@@ -21,7 +21,6 @@ Redpear::Model is VERY lightweight. It is optimised for raw speed at the
 expense of convenience.
 =end
 class Redpear::Model < Hash
-  autoload :Machinist, 'redpear/model/machinist'
   include Redpear::Schema
 
   class << self
@@ -152,6 +151,8 @@ class Redpear::Model < Hash
   # @return [Object]
   #   The attribute value
   def [](name)
+    return if frozen?
+
     column = self.class.columns[name]
     return super if column.nil? || key?(column)
 
@@ -173,6 +174,7 @@ class Redpear::Model < Hash
   def []=(name, value)
     column = self.class.columns[name] || return
     value  = column.encode_value(value)
+    delete column.to_s
 
     case column
     when Redpear::Schema::Score
@@ -183,7 +185,6 @@ class Redpear::Model < Hash
     when Redpear::Schema::Column
       attributes[column] = value
     end
-    delete column.to_s
   end
 
   # Increments the value of a counter attribute
@@ -225,6 +226,7 @@ class Redpear::Model < Hash
   # Bulk-updates the model
   # @return [Hash]
   def update(hash)
+    clear
     self.class.transaction do
       bulk = {}
       hash.each do |name, value|
@@ -243,8 +245,7 @@ class Redpear::Model < Hash
       end
       attributes.merge! bulk
     end
-
-    clear
+    self
   end
 
   # Clear all the cached attributes, but keep ID
@@ -276,6 +277,7 @@ class Redpear::Model < Hash
       lookups.each {|l| l.delete(id) }
       attributes.purge!
     end
+    freeze
     true
   end
 

@@ -322,5 +322,17 @@ describe Redpear::Model do
       }.should change { subject.class.exists?(subject.id) }.from(true).to(false)
     end
 
+    it 'should freeze destroyed records' do
+      subject.destroy.should be(true)
+      subject.should be_frozen
+    end
+
+    it 'should prevent users from modifying destroyed records' do
+      subject.destroy.should be(true)
+      subject['title'].should be_nil
+      lambda { subject['title'] = "New Title" }.should raise_error(RuntimeError, /frozen/)
+      lambda { subject.update 'title' => "New Title" }.should raise_error(RuntimeError, /frozen/)
+    end
+
   end
 end
