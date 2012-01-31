@@ -35,6 +35,10 @@ describe Redpear::Model do
       subject.pk_counter.next.should == 1
     end
 
+    it 'should have a create alias for new' do
+      subject.create.should be_instance_of(subject)
+    end
+
     it 'should have a scope' do
       subject.scope.should == "posts"
     end

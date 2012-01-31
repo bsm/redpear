@@ -30,6 +30,8 @@ class Redpear::Model < Hash
 
   class << self
 
+    alias_method :create, :new
+
     # @param [Redpear::Connection] define a custom connection
     attr_writer :connection
 
