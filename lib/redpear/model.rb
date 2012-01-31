@@ -21,7 +21,12 @@ Redpear::Model is VERY lightweight. It is optimised for raw speed at the
 expense of convenience.
 =end
 class Redpear::Model < Hash
+  autoload :Finders, 'redpear/model/finders'
+  autoload :Expiration, 'redpear/model/expiration'
+
   include Redpear::Schema
+  include Finders
+  include Expiration
 
   class << self
 
@@ -66,36 +71,6 @@ class Redpear::Model < Hash
     # @yield operations that should be run in the transaction
     def transaction(&block)
       connection.transaction(&block)
-    end
-
-    # @return [Integer] the number of total records
-    def count
-      members.size
-    end
-
-    # @param [String] id the ID to check
-    # @return [Boolean] true or false
-    def exists?(id)
-      !id.nil? && members.include?(id)
-    end
-
-    # @param [String] id the ID of the record to find
-    # @return [Redpear::Model] a record, or nil when not found
-    def find(id)
-      instantiate(id) if exists?(id)
-    end
-
-    # @return [Array<Redpear::Model>] all records
-    def all
-      members.map &method(:find)
-    end
-
-    # @yield over each available record
-    # @yieldparam [Redpear::Model] record
-    def find_each
-      members.each do |id|
-        yield find(id)
-      end
     end
 
     # Destroys a record. Example:
@@ -208,21 +183,6 @@ class Redpear::Model < Hash
     increment name, -by
   end
 
-  # Expires the record.
-  # @overload expire(time)
-  #   @param [Time] time The time to expire the record at
-  # @overload expire(number)
-  #   @param [Integer] number Expire in `number` of seconds from now
-  def expire(value)
-    attributes.expire(value)
-  end
-
-  # @return [Integer] the period this record has to live.
-  # May return nil for non-expiring records and non-existing records.
-  def ttl
-    attributes.ttl
-  end
-
   # Bulk-updates the model
   # @return [Hash]
   def update(hash)
@@ -278,7 +238,6 @@ class Redpear::Model < Hash
       attributes.purge!
     end
     freeze
-    true
   end
 
   # Show information about this record
@@ -291,7 +250,6 @@ class Redpear::Model < Hash
   def store(key, value)
     super key.to_s, value
   end
-
   private :store, :fetch, :delete, :delete_if, :keep_if, :merge!, :reject!, :select!, :replace
 
 end

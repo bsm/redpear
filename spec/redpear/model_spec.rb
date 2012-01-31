@@ -64,42 +64,6 @@ describe Redpear::Model do
 
   end
 
-  describe "finders" do
-
-    it 'should have a count' do
-      5.times { Post.new }
-      Post.count.should == 5
-    end
-
-    it 'should check if a record exists' do
-      Post.exists?(Post.new.id).should be(true)
-      Post.exists?(nil).should be(false)
-      Post.exists?(1234).should be(false)
-    end
-
-    it 'should find individual records' do
-      post = Post.new :title => 'A Title'
-      Post.find(post.id).should be_a(Post)
-      Post.find(post.id).should == post
-      Post.find(post.id).should == { 'id' => post.id }
-      Post.find(nil).should be_nil
-      Post.find(1234).should be_nil
-    end
-
-    it 'should find all records' do
-      p1, p2  = Post.new(:title => 'A Title'), Post.new(:title => 'B Title')
-      Post.all.should =~ [p1, p2]
-    end
-
-    it 'should find each record' do
-      p1, p2  = Post.new(:title => 'A Title'), Post.new(:title => 'B Title')
-      yielded = []
-      Post.find_each {|i| yielded << i }
-      yielded.should =~ [p1, p2]
-    end
-
-  end
-
   it { should be_a(Hash) }
 
   it 'should be comparable' do
@@ -256,43 +220,12 @@ describe Redpear::Model do
 
   end
 
-  describe "expiration" do
-    subject { Post.new :title => 'Any' }
-
-    it 'should ignore invalid expire values' do
-      subject.expire(nil).should be(false)
-      subject.expire(false).should be(false)
-      subject.expire("ABC").should be(false)
-    end
-
-    it 'should allow to expire records via timestamps' do
-      subject.expire(Time.now + 3600).should be(true)
-      subject.ttl.should > 0
-      subject.ttl.should <= 3600
-    end
-
-    it 'should allow to expire records via numeric periods' do
-      subject.expire(3600).should be(true)
-      subject.ttl.should > 0
-      subject.ttl.should <= 3600
-    end
-
-    it 'should return negative ttl for non-expiring records' do
-      subject.ttl.should be_nil
-    end
-
-    it 'should return a positive ttl for expiring records' do
-      subject.expire(30)
-      subject.ttl.should > 0
-    end
-  end
-
   describe "destroying" do
     subject { Post.new :id => 1, :user_id => 5, :rank => 20 }
 
     it 'should destroy records' do
       lambda {
-        subject.destroy.should be(true)
+        subject.destroy.should == subject
       }.should change { subject.class.exists?(subject.id) }.from(true).to(false)
     end
 
@@ -323,12 +256,12 @@ describe Redpear::Model do
     end
 
     it 'should freeze destroyed records' do
-      subject.destroy.should be(true)
+      subject.destroy
       subject.should be_frozen
     end
 
     it 'should prevent users from modifying destroyed records' do
-      subject.destroy.should be(true)
+      subject.destroy
       subject['title'].should be_nil
       lambda { subject['title'] = "New Title" }.should raise_error(RuntimeError, /frozen/)
       lambda { subject.update 'title' => "New Title" }.should raise_error(RuntimeError, /frozen/)
