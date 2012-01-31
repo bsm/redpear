@@ -66,6 +66,11 @@ describe Redpear::Store::Hash do
     subject['a'].should == 'b'
     subject['a'] = 'c'
     subject['a'].should == 'c'
+    subject['a'] = false
+    subject['a'].should == 'false'
+    subject['a'] = nil
+    subject['a'].should be_nil
+    subject.keys.should_not include('a')
   end
 
   it 'should increment values' do
@@ -116,6 +121,7 @@ describe Redpear::Store::Hash do
     subject.store('c', 'd')
     subject.to_hash.should == {'a' => 'b', 'c' => 'd'}
     subject.update('c' => 'x', 'e' => 'f').should == {'a' => 'b', 'c' => 'x', 'e' => 'f'}
+    subject.update('a' => nil, 'e' => 'y').should == {'c' => 'x', 'e' => 'y'}
   end
 
   it 'should have a custom inspect' do

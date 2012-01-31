@@ -48,7 +48,11 @@ class Redpear::Store::Hash < Redpear::Store::Enumerable
   # @param [Hash] options
   #   The value to store
   def store(field, value, options = {})
-    conn.hset key, field, value
+    if value.nil?
+      delete field
+    else
+      conn.hset key, field, value
+    end
   end
   alias_method :[]=, :store
 
@@ -101,6 +105,9 @@ class Redpear::Store::Hash < Redpear::Store::Enumerable
   # @param [Hash] hash
   #   The pairs to merge
   def merge!(hash)
+    hash = hash.reject do |field, value|
+      delete(field) if value.nil?
+    end
     conn.hmset key, *hash.flatten
   end
 

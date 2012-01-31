@@ -6,10 +6,17 @@ class Redpear::Schema::Index < Redpear::Schema::Column
     members record.send(name)
   end
 
-  # @param [String] foreign_key the foreign key
+  # @param [String] index value
   # @return [Redpear::Store::Set] the set holding the IDs for the given `foreign_key`
-  def members(foreign_key)
-    Redpear::Store::Set.new model.scoped("+", name, foreign_key), model.connection
+  def members(value)
+    value = '_' if value.nil?
+    Redpear::Store::Set.new nested_key(name, value), model.connection
   end
+
+  private
+
+    def nested_key(*tokens)
+      model.nested_key(:~, *tokens)
+    end
 
 end

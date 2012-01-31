@@ -47,8 +47,8 @@ describe Redpear::Model do
       Manager.scope.should == "execs"
     end
 
-    it 'should build scopes' do
-      subject.scoped(1, 2, "X").should == "posts:1:2:X"
+    it 'should build nested keys' do
+      subject.nested_key(1, 2, "X").should == "posts:1:2:X"
     end
 
     it 'should allow transactions' do
@@ -92,10 +92,17 @@ describe Redpear::Model do
     post.should == {'id' => '1'}
   end
 
-  it 'should allow have raw attributes' do
+  it 'should give access to raw attributes' do
     post = Post.new(:id => 1, :title => 'A Title')
     post.attributes.should be_instance_of(Redpear::Store::Hash)
     post.attributes.should == { 'title' => 'A Title' }
+    post.attributes.to_s.should == "posts::1"
+  end
+
+  it 'should give access to raw lookups' do
+    post = Post.new(:id => 1, :title => 'A Title', :user_id => 2)
+    post.should have(3).lookups
+    post.lookups.map(&:to_s).should =~ ["posts:~", "posts:~:rank", "posts:~:user_id:2"]
   end
 
   describe "initialization" do
@@ -158,6 +165,12 @@ describe Redpear::Model do
       subject.user_id.should == "123"
     end
 
+    it 'should NOT write indicies if NULL' do
+      subject.should == {'id' => '1'}
+      subject['user_id'] = nil
+      Post.columns['user_id'].members(nil).should == []
+    end
+
     it 'should write single scores' do
       subject.should == {'id' => '1'}
       subject['rank'] = 10
@@ -165,6 +178,12 @@ describe Redpear::Model do
       subject.attributes == {}
       Post.columns['rank'].members[1].should == 10
       subject.rank.should == 10
+    end
+
+    it 'should NOT write scores if NULL' do
+      subject.should == {'id' => '1'}
+      subject['rank'] = nil
+      Post.columns['rank'].members[1].should be_nil
     end
 
   end
@@ -183,10 +202,22 @@ describe Redpear::Model do
       Post.columns['user_id'].members('2').should == [subject.id]
     end
 
+    it 'should NOT update indicies if NULL' do
+      post = Post.new :id => 2
+      post.user_id.should be_nil
+      Post.columns['user_id'].members(nil).should == []
+    end
+
     it 'should update scores' do
       subject.attributes.should == {"title"=>"A Title", "user_id"=>"2"}
       subject.user_id.should == "2"
       Post.columns['rank'].members[subject.id].should == 10
+    end
+
+    it 'should NOT update scores if NULL' do
+      post = Post.new :id => 2
+      post.rank.should be_nil
+      Post.columns['rank'].members[post.id].should be_nil
     end
 
     it 'should clear cache' do

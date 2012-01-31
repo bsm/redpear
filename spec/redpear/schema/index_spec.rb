@@ -11,11 +11,16 @@ describe Redpear::Schema::Index do
   it 'should return members store for a record' do
     comment = Comment.new :post_id => 100
     subject.for(comment).should be_instance_of(Redpear::Store::Set)
-    subject.for(comment).key.should == "comments:+:post_id:100"
+    subject.for(comment).key.should == "comments:~:post_id:100"
   end
 
+  it 'should return blank members store for a record without values' do
+    comment = Comment.new
+    subject.for(comment).should be_instance_of(Redpear::Store::Set)
+    subject.for(comment).key.should == "comments:~:post_id:_"
+  end
   it 'should return members store for a value' do
-    subject.members(200).key.should == "comments:+:post_id:200"
+    subject.members(200).key.should == "comments:~:post_id:200"
     subject.members(200).should be_instance_of(Redpear::Store::Set)
     subject.members(200).should == []
     subject.members(200).add 1

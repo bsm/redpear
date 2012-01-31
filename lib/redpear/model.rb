@@ -53,20 +53,20 @@ class Redpear::Model < Hash
     #   The tokens to add to the scope
     # @return [String] the full scope.
     # Examples:
-    #   Comment.scoped(123) # => "comments:123"
-    #   Comment.scoped("[i1]", 123) # => "comments:[i1]:123"
-    def scoped(*tokens)
+    #   Comment.nested_key(123) # => "comments:123"
+    #   Comment.nested_key("abc", 123) # => "comments:abc:123"
+    def nested_key(*tokens)
       [scope, *tokens].join(':')
     end
 
     # @return [Redpear::Store::Set] the IDs of all existing records
     def members
-      @_members ||= Redpear::Store::Set.new scoped("~"), connection
+      @_members ||= Redpear::Store::Set.new nested_key(:~), connection
     end
 
     # @return [Redpear::Store::Counter] the generator of primary keys
     def pk_counter
-      @_pk_counter ||= Redpear::Store::Counter.new scoped("+"), connection
+      @_pk_counter ||= Redpear::Store::Counter.new nested_key(:+), connection
     end
 
     # Runs a bulk-operation.
@@ -150,18 +150,8 @@ class Redpear::Model < Hash
   #   The value to store
   def []=(name, value)
     column = self.class.columns[name] || return
-    value  = column.encode_value(value)
     delete column.to_s
-
-    case column
-    when Redpear::Schema::Score
-      column.members[id] = value
-    when Redpear::Schema::Index
-      column.members(value).add(id)
-      attributes[column] = value
-    when Redpear::Schema::Column
-      attributes[column] = value
-    end
+    store_attribute attributes, column, value
   end
 
   # Increments the value of a counter attribute
@@ -193,17 +183,7 @@ class Redpear::Model < Hash
       bulk = {}
       hash.each do |name, value|
         column = self.class.columns[name] || next
-        value  = column.encode_value(value)
-
-        case column
-        when Redpear::Schema::Score
-          column.members[id] = value
-        when Redpear::Schema::Index
-          column.members(value).add(id)
-          bulk[column] = value
-        when Redpear::Schema::Column
-          bulk[column] = value
-        end
+        store_attribute bulk, column, value
       end
       attributes.merge! bulk
     end
@@ -222,7 +202,7 @@ class Redpear::Model < Hash
   # Returns the attributes store
   # @return [Redpear::Store::Hash] attributes
   def attributes
-    @_attributes ||= Redpear::Store::Hash.new self.class.scoped('~', id), self.class.connection
+    @_attributes ||= Redpear::Store::Hash.new self.class.nested_key("", id), self.class.connection
   end
 
   # Return lookups, relevant to this record
@@ -252,6 +232,24 @@ class Redpear::Model < Hash
   def store(key, value)
     super key.to_s, value
   end
-  private :store, :fetch, :delete, :delete_if, :keep_if, :merge!, :reject!, :select!, :replace
+
+  # Store an attribute in target
+  def store_attribute(target, column, value)
+    value = column.encode_value(value)
+
+    case column
+    when Redpear::Schema::Score
+      column.members[id] = value    unless value.nil?
+    when Redpear::Schema::Index
+      column.members(value).add(id) unless value.nil?
+      target[column] = value
+    when Redpear::Schema::Column
+      target[column] = value
+    end
+
+    value
+  end
+  protected :store, :store_attribute
+  private   :fetch, :delete, :delete_if, :keep_if, :merge!, :reject!, :select!, :replace
 
 end
