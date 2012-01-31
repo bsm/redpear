@@ -45,7 +45,7 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   # @return [Integer] the score for the given `member`
   def score(member)
     number = conn.zscore(key, member)
-    number.to_i if number
+    number.to_f if number
   end
   alias_method :[], :score
 
@@ -145,19 +145,40 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   end
 
   # @param [Integer] index
-  # @return [String] member for given `index`.
-  def at(index)
-    slice(index..index, :with_scores => false).first
+  # @param [Hash] options
+  # @option [Boolean] with_scores
+  #   Return with scores, defaults to true
+  # @return [Array] member + score for given `index`.
+  def at(index, options = {})
+    slice(index..index, options).first
   end
 
   # @return [String] member with the lowest index
   def first(count = 0)
-    count > 0 ? slice(0..(count-1), :with_scores => false).to_a : at(0)
+    if count > 0
+      slice(0..(count-1), :with_scores => false)
+    else
+      at(0, :with_scores => false)
+    end
   end
 
   # @return [String] member with the highest index
   def last(count = 0)
-    count > 0 ? slice(-count..-1, :with_scores => false).to_a : at(-1)
+    if count > 0
+      slice(-count..-1, :with_scores => false)
+    else
+      at(-1, :with_scores => false)
+    end
+  end
+
+  # @return [Float] the lowest score
+  def minimum
+    _, score = at(0); score
+  end
+
+  # @return [Float] the higest score
+  def maximum
+    _, score = at(-1); score
   end
 
   # Store the result of a union in a new +target+ key
@@ -195,7 +216,7 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   # @param [Integer] by
   #   The increment, defaults to 1
   def increment(member, by = 1)
-    conn.zincrby(key, by, member).to_i
+    conn.zincrby(key, by, member).to_f
   end
 
   # @param [String] member
@@ -212,7 +233,7 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
       options[:limit]       = [options[:offset] || 0, options[:limit]] if options[:offset] || options[:limit]
       options[:with_scores] = true unless options.key?(:with_scores)
       result = conn.send method, key, start, finish, options
-      options[:with_scores] ? result.each_slice(2).map {|m,s| [m, s.to_i] } : result
+      options[:with_scores] ? result.each_slice(2).map {|m,s| [m, s.to_f] } : result
     end
 
 end

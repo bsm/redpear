@@ -19,6 +19,12 @@ describe Redpear::Store::SortedSet do
     subject.to_a(:with_scores => false).should == ['a']
   end
 
+  it 'should return scores as floats' do
+    subject.add('a', 1)
+    subject.to_a.first.last.should == 1.0
+    subject.to_a.first.last.should be_instance_of(Float)
+  end
+
   it 'should yield all each member' do
     subject.add('a', 1)
     yielded = []
@@ -85,6 +91,7 @@ describe Redpear::Store::SortedSet do
     subject.add('a', 20)
     subject.add('b', 10)
     subject.score('a').should == 20
+    subject.score('a').should be_instance_of(Float)
     subject['b'].should == 10
     subject['c'].should be_nil
   end
@@ -122,12 +129,12 @@ describe Redpear::Store::SortedSet do
     subject.add('a', 30)
     subject.add('b', 20)
     subject.add('c', 10)
-    subject.at(1).should == 'b'
-    subject.at(2).should == 'a'
+    subject.at(1).should == ['b', 20.0]
+    subject.at(2, :with_scores => false).should == 'a'
     subject.at(3).should be_nil
   end
 
-  it 'should return the first and last value(s)' do
+  it 'should return the first and last member(s)' do
     subject.add('a', 30)
     subject.add('b', 20)
     subject.add('c', 10)
@@ -137,12 +144,24 @@ describe Redpear::Store::SortedSet do
     subject.first(2).should == ['c', 'b']
   end
 
+  it 'should return the minimum and the maximum score(s)' do
+    subject.minimum.should be_nil
+    subject.maximum.should be_nil
+    subject.add('a', 30)
+    subject.add('b', 20)
+    subject.add('c', 10)
+    subject.minimum.should be_instance_of(Float)
+    subject.maximum.should be_instance_of(Float)
+    subject.minimum.should == 10.0
+    subject.maximum.should == 30.0
+  end
+
   it 'should build union and store results' do
     subject.add('a', 30).add('b', 20).add('c', 10)
     other.add('a', 40).add('d', 5)
 
     result = subject.unionstore('target', other, :aggregate => :sum)
-    result.should be_a(described_class)
+    result.should be_instance_of(described_class)
     result.key.should == "target"
     result.should == [["d", 5], ["c", 10], ["b", 20], ["a", 70]]
   end
@@ -152,7 +171,7 @@ describe Redpear::Store::SortedSet do
     other.add('a', 40).add('d', 5)
 
     result = subject.interstore('target', other, :aggregate => :max)
-    result.should be_a(described_class)
+    result.should be_instance_of(described_class)
     result.key.should == "target"
     result.should == [["a", 40]]
   end
