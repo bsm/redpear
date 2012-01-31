@@ -1,6 +1,33 @@
+require 'securerandom'
+
 class Redpear::Store::Base
 
   attr_reader :key, :conn
+
+  # Creates and yields over a temporary key.
+  # Useful in combination with e.g. `interstore`, `unionstore`, etc.
+  #
+  # @param [Redpear::Connection] conn
+  #   The connection
+  # @param [Hash] options
+  #   The options hash
+  # @option [String] prefix
+  #   Specify a key prefix. Example:
+  #      Base.temporary conn, :prefix => "temp:" do |c|
+  #        store.key # => temp:55ee0c1ec9530cf545bc25040beb4f292fd448af
+  #      end
+  # @yield [Redpear::Store::Base]
+  #   The temporary key
+  def self.temporary(conn, options = {})
+    store = nil
+    while !store || store.exists?
+      key   = "#{options[:prefix]}#{SecureRandom.hex(20)}"
+      store = new(key, conn)
+    end
+    yield store
+  ensure
+    store.clear if store
+  end
 
   # Constructor
   # @param [String] key

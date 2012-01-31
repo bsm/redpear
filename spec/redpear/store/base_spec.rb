@@ -10,6 +10,44 @@ describe Redpear::Store::Base do
     Redpear::Store::Value.new 'value:key', connection
   end
 
+  describe "class" do
+
+    it "should create temporary keys" do
+      Redpear::Store::Value.temporary connection do |target|
+        target.should be_instance_of(Redpear::Store::Value)
+        target.to_s.should match(/\A[0-9a-f]{40}\z/)
+      end
+    end
+
+    it "should remove temporary keys after use" do
+      yielded = nil
+      Redpear::Store::Value.temporary connection do |store|
+        yielded = store
+        store.set 'a'
+        store.exists?.should be(true)
+      end
+      yielded.should be_instance_of(Redpear::Store::Value)
+      yielded.exists?.should be(false)
+    end
+
+    it "should never override existing keys" do
+      record.set "present"
+      SecureRandom.should_receive(:hex).twice.and_return(record.key, "next:key")
+      Redpear::Store::Value.temporary connection do |store|
+        store.to_s.should == "next:key"
+      end
+      record.should == "present"
+    end
+
+    it "should allow to specify prefixes" do
+      Redpear::Store::Value.temporary connection, :prefix => "temp:" do |store|
+        store.to_s.should include("temp:")
+        store.to_s.size.should == 45
+      end
+    end
+
+  end
+
   its(:value) { should be_nil }
 
   it 'should have a key' do
