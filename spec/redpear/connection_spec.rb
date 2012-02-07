@@ -41,6 +41,24 @@ describe Redpear::Connection do
     subject.hgetall('hash').should == { 'a' => '1', 'b' => '2', 'c' => '3', 'd' => '4' }
   end
 
+
+  it 'should have master methods' do
+    described_class::MASTER_METHODS.size.should == 63
+  end
+
+  it 'should have slave methods' do
+    described_class::SLAVE_METHODS.size.should == 68
+  end
+
+  it 'should have no clashes between methods' do
+    (described_class::MASTER_METHODS & described_class::SLAVE_METHODS).should == []
+  end
+
+  it 'should provide a complete set of methods' do
+    irrelevant = [:client, :without_reconnect, :id, :inspect, :method_missing]
+    (Redis.public_instance_methods(false) - described_class::MASTER_METHODS - described_class::SLAVE_METHODS).should =~ irrelevant
+  end
+
   (described_class::MASTER_METHODS + described_class::SLAVE_METHODS).each do |method|
     let :redis_methods do
       Redis.instance_methods.map(&:to_sym)

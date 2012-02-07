@@ -5,42 +5,30 @@
 #
 class Redpear::Connection
 
-  MASTER_METHODS = %w|
-    append auth
-    bgrewriteaof bgsave blpop brpop brpoplpush
-    config
-    decr decrby del discard
-    exec expire expireat
-    flushall flushdb getset
-    hset hsetnx hincrby hmset hdel
-    incr incrby
-    linsert lpop lpush lpushx lrem lset ltrim
-    mapped_hmset mapped_mset mapped_msetnx
-    move mset msetnx multi
-    persist pipelined psubscribe punsubscribe quit
-    rename renamenx rpop rpoplpush rpush rpushx
-    sadd save sdiffstore set setbit
-    setex setnx setrange sinterstore
-    shutdown smove spop srem subscribe
-    sunionstore sync synchronize
-    unsubscribe unwatch watch
-    zadd zincrby zinterstore zrem
-    zremrangebyrank zremrangebyscore zunionstore
-  |.freeze
+  MASTER_METHODS = [
+    :append, :blpop, :brpop, :brpoplpush, :decr, :decrby, :del, :discard,
+    :exec, :expire, :expireat, :getset, :hset, :hsetnx, :hincrby, :hmset,
+    :hdel, :incr, :incrby, :linsert, :lpop, :lpush, :lpushx, :lrem, :lset,
+    :ltrim, :mapped_hmset, :mapped_mset, :mapped_msetnx, :move, :mset, :msetnx,
+    :multi, :persist, :pipelined, :rename, :renamenx, :rpop, :rpoplpush,
+    :rpush, :rpushx, :sadd, :sdiffstore, :set, :setbit, :setex, :setnx,
+    :setrange, :sinterstore, :smove, :spop, :srem, :sunionstore, :unwatch,
+    :watch, :zadd, :zincrby, :zinterstore, :zrem, :zremrangebyrank,
+    :zremrangebyscore, :zunionstore, :[]=
+  ].freeze
 
-  SLAVE_METHODS = %w|
-    dbsize debug get getbit getrange
-    echo exists
-    hget hmget hexists hlen hkeys hvals hgetall
-    info keys lastsave lindex llen lrange
-    mapped_hmget mapped_mget mget monitor
-    object ping publish randomkey
-    scard sdiff select sinter sismember slaveof
-    smembers sort srandmember strlen substr sunion
-    ttl type
-    zcard zcount zrange zrangebyscore zrank
-    zrevrange zrevrangebyscore zrevrank zscore
-  |.freeze
+  SLAVE_METHODS = [
+    :auth, :bgrewriteaof, :bgsave, :config, :dbsize, :debug, :get, :getbit,
+    :getrange, :echo, :exists, :flushall, :flushdb, :hget, :hmget, :hexists,
+    :hlen, :hkeys, :hvals, :hgetall, :info, :keys, :lastsave, :lindex, :llen,
+    :lrange, :mapped_hmget, :mapped_mget, :mget, :monitor, :object, :ping,
+    :publish, :psubscribe, :punsubscribe, :quit, :randomkey, :save, :scard,
+    :sdiff, :select, :shutdown, :sinter, :sismember, :slaveof, :smembers,
+    :sort, :srandmember, :strlen, :subscribe, :subscribed?, :substr, :sunion,
+    :sync, :synchronize, :ttl, :type, :unsubscribe, :zcard, :zcount, :zrange,
+    :zrangebyscore, :zrank, :zrevrange, :zrevrangebyscore, :zrevrank, :zscore,
+    :[]
+  ].freeze
 
   # @return [Symbol] ther current connection, either :master or :slave
   attr_reader   :current
@@ -74,9 +62,11 @@ class Redpear::Connection
   #   Either :master or :slave
   # @yield
   #   Perform a block with the given connection
+  # @yieldparam [Redpear::Connection]
+  #   The chosen connection, master or slave
   def on(name)
     @current = send(name)
-    yield
+    yield(@current)
   ensure
     @current = nil
   end
