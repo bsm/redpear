@@ -2,6 +2,13 @@ require 'rubygems'
 require 'bundler/setup'
 
 require 'rspec'
+case ENV['CONN']
+when 'hiredis'
+  require 'redis/connection/hiredis'
+else
+  require 'redis/connection/ruby'
+end
+
 require 'redpear'
 require 'support/models'
 require 'support/blueprints'
