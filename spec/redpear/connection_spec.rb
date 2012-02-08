@@ -19,7 +19,7 @@ describe Redpear::Connection do
     ms.master.should_not be(ms.slave)
   end
 
-  it "should accept transaction" do
+  it "should accept transactions" do
     subject.transaction do
       subject.hset 'hash', 'a', 1
       subject.hset 'hash', 'b', 2
