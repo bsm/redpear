@@ -7,7 +7,7 @@ require 'support/models'
 require 'support/blueprints'
 require 'support/factories'
 
-count = Redis.current.keys.size
+count = Redis.current.dbsize
 unless count.zero?
   STDERR.puts
   STDERR.puts " !! WARNING!"
