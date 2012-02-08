@@ -37,8 +37,7 @@ class Redpear::Store::Base
   def initialize(key, conn)
     @key, @conn = key, conn
   end
-
-  alias to_s key
+  alias_method :to_s, :key
 
   # @return [String] custom inspect
   def inspect
@@ -48,6 +47,12 @@ class Redpear::Store::Base
   # @return [Boolean] true if the record exists
   def exists?
     !!conn.exists(key)
+  end
+
+  # Watch this key
+  # @return [Boolean] true if successful
+  def watch
+    conn.watch(key) == "OK"
   end
 
   # @return [Integer] remaining time-to-live in seconds (if set)

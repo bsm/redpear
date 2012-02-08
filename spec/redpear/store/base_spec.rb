@@ -104,6 +104,10 @@ describe Redpear::Store::Base do
     record.exists?.should be(true)
   end
 
+  it 'should allow to watch a key' do
+    record.watch.should be(true)
+  end
+
   it 'should allow purging records' do
     record.set 'abcd'
     record.exists?.should be(true)

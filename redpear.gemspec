@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+require File.expand_path('../lib/redpear/version', __FILE__)
 
 Gem::Specification.new do |s|
   s.platform = Gem::Platform::RUBY
@@ -8,7 +9,7 @@ Gem::Specification.new do |s|
   s.name        = "redpear"
   s.summary     = "Redpear, a Redis ORM"
   s.description = "Simple, elegant & efficient ORM for Redis"
-  s.version     = "0.7.1"
+  s.version     = Redpear::VERSION::STRING.dup
 
   s.authors     = ["Dimitrij Denissenko"]
   s.email       = "dimitrij@blacksquaremedia.com"
