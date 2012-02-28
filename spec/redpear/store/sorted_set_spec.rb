@@ -14,6 +14,7 @@ describe Redpear::Store::SortedSet do
 
   it 'should return all members' do
     subject.to_a.should  == []
+    subject.to_a(:with_scores => false).should == []
     subject.add('a', 1)
     subject.to_a.should == [['a', 1]]
     subject.to_a(:with_scores => false).should == ['a']

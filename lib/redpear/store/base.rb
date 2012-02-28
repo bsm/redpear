@@ -26,7 +26,7 @@ class Redpear::Store::Base
     end
     yield store
   ensure
-    store.clear if store
+    store.purge! if store
   end
 
   # Constructor
