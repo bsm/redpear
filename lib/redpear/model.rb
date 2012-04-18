@@ -185,6 +185,7 @@ class Redpear::Model < Hash
       store_attribute bulk, column, value
     end
     attributes.merge! bulk
+    after_save(hash)
     self
   end
 
@@ -254,6 +255,12 @@ class Redpear::Model < Hash
   # @params [Hash] attrs attributes used on initialization
   def after_create(attrs)
     self.class.members.add(id)
+  end
+
+  # Cheap after save callback, override in subclasses and don't forget to
+  # call `super()`.
+  # @params [Hash] attrs attributes used on save
+  def after_save(attrs)
   end
 
   # Cheap before destroy callback, override in subclasses and don't forget to
