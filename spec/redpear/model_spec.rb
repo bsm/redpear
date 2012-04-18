@@ -52,6 +52,7 @@ describe Redpear::Model do
     end
 
     it 'should allow transactions' do
+      subject.pk_counter
       subject.transaction do
         subject.pk_counter.next
         subject.pk_counter.next
