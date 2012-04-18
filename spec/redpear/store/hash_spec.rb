@@ -124,6 +124,11 @@ describe Redpear::Store::Hash do
     subject.update('a' => nil, 'e' => 'y').should == {'c' => 'x', 'e' => 'y'}
   end
 
+  it 'should not fail on empty updates' do
+    subject.store('c', 'd')
+    subject.update({}).should == {'c' => 'd'}
+  end
+
   it 'should have a custom inspect' do
     subject.inspect.should == %(#<Redpear::Store::Hash hash:key: {}>)
     subject.update('a' => 'b')

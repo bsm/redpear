@@ -96,7 +96,7 @@ class Redpear::Model < Hash
     super()
     store 'id', (attrs.delete("id") || attrs.delete(:id) || self.class.pk_counter.next).to_s
     update(attrs)
-    self.class.members.add(id)
+    after_create(attrs)
   end
 
   # @return [String] the ID of this record
@@ -179,14 +179,12 @@ class Redpear::Model < Hash
   # @return [Hash]
   def update(hash)
     clear
-    self.class.transaction do
-      bulk = {}
-      hash.each do |name, value|
-        column = self.class.columns[name] || next
-        store_attribute bulk, column, value
-      end
-      attributes.merge! bulk
+    bulk = {}
+    hash.each do |name, value|
+      column = self.class.columns[name] || next
+      store_attribute bulk, column, value
     end
+    attributes.merge! bulk
     self
   end
 
@@ -214,10 +212,11 @@ class Redpear::Model < Hash
   # Destroy the record.
   # @return [Boolean] true if successful
   def destroy
-    lookups # Build before transaction
+    before_destroy
     self.class.transaction do
       lookups.each {|l| l.delete(id) }
       attributes.purge!
+      after_destroy
     end
     freeze
   end
@@ -249,7 +248,27 @@ class Redpear::Model < Hash
 
     value
   end
-  protected :store, :store_attribute
+
+  # Cheap after create callback, override in subclasses and don't forget to
+  # call `super()`.
+  # @params [Hash] attrs attributes used on initialization
+  def after_create(attrs)
+    self.class.members.add(id)
+  end
+
+  # Cheap before destroy callback, override in subclasses and don't forget to
+  # call `super()`.
+  def before_destroy
+    lookups # Build lookups
+  end
+
+  # Cheap after destroy callback, override in subclasses and don't forget to
+  # call `super()`. Called within the transaction, be careful not to include
+  # read opertions.
+  def after_destroy
+  end
+
+  protected :store, :store_attribute, :after_create, :before_destroy, :after_destroy
   private   :fetch, :delete, :delete_if, :keep_if, :merge!, :reject!, :select!, :replace
 
 end

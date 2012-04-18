@@ -108,7 +108,7 @@ class Redpear::Store::Hash < Redpear::Store::Enumerable
     hash = hash.reject do |field, value|
       delete(field) if value.nil?
     end
-    conn.hmset key, *hash.flatten
+    conn.hmset key, *hash.flatten unless hash.empty?
   end
 
   # Comparator
