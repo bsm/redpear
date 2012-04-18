@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    redpear (0.7.5)
+    redpear (0.7.6)
       redis (~> 2.2.0)
 
 GEM

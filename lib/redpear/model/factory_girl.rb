@@ -18,7 +18,7 @@ class Redpear::Model
 
     # @return [Boolean] always true. FactoryGirl requires it.
     def save!
-      after_create({}) # call after_create again
+      after_save({}) # call after_save again
       true
     end
 
