@@ -135,7 +135,7 @@ class Redpear::Store::Set < Redpear::Store::Enumerable
     other.respond_to?(:to_set) && other.to_set == to_set
   end
 
-  # Move a value to +target+ set
+  # Moves a value to +target+ set
   # @param [String] target
   #   The key of the target set
   # @param [String] value
@@ -143,5 +143,16 @@ class Redpear::Store::Set < Redpear::Store::Enumerable
   def move(target, value)
     conn.smove key, target.to_s, value
   end
+
+  # Replaces this set with the elements from +other+
+  # @param [Enumerable] other
+  #   The elements to replace this set with
+  def replace(other)
+    conn.transaction do
+      purge!
+      other.each {|e| add(e) }
+    end
+  end
+  
 
 end
