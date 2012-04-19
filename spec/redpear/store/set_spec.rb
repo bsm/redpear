@@ -132,10 +132,4 @@ describe Redpear::Store::Set do
     subject.should == ['b']
   end
 
-  it 'should replace with other values' do
-    subject << 'a' << 'b' << 'c'
-    subject.replace(['1', '2'])
-    subject.members.should == ['1', '2']
-  end
-
 end
