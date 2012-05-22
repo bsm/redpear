@@ -115,11 +115,15 @@ class Redpear::Store::Base
 
   private
 
-    def range_pair(range)
-      first = range.first.to_i
-      last  = range.last.to_i
-      last -= 1 if range.exclude_end?
-      [first, last]
+    def range_pair(value)
+      case value
+      when Range
+        first, last = value.first.to_i, value.last.to_i
+        last -= 1 if value.exclude_end?
+        [first, last]
+      when Array
+        [value.first, value.last]
+      end
     end
 
 end

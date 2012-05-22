@@ -23,7 +23,11 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   end
   alias_method :size, :length
 
-  # @param [Range] range
+  # Returns items from range
+  # @overload count(range)
+  #   @param [Range] range
+  # @overload count(range)
+  #   @param [Array] range, e.g. [0, "+inf"]
   # @return [Integer] the number of items within given score `range`
   def count(range)
     conn.zcount key, *range_pair(range)
@@ -85,8 +89,10 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   end
 
   # Returns a slice of members between index +range+, with the lower index returned first
-  # @param [Range] range
-  #   The index range of the elements
+  # @overload slice(range)
+  #   @param [Range] range
+  # @overload slice(range)
+  #   @param [Array] range, e.g. [0, "+inf"]
   # @param [Hash] options
   # @option [Boolean] with_scores
   #   Return with scores, defaults to true
@@ -98,8 +104,10 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   alias_method :top, :slice
 
   # Returns a slice of members between rindex +range+, with the higher index returned first
-  # @param [Range] range
-  #   The rindex range of the elements
+  # @overload rslice(range)
+  #   @param [Range] range The rindex range of the elements
+  # @overload rslice(range)
+  #   @param [Array] range as Array, e.g. [0, "+inf"]
   # @param [Hash] options
   # @option [Boolean] with_scores
   #   Return with scores, defaults to true
@@ -111,8 +119,10 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   alias_method :bottom, :rslice
 
   # Selects members between a score +range+. Lower scores returned first
-  # @param [Range] range
-  #   The score range of the elements
+  # @overload select(range)
+  #   @param [Range] range The score range of the elements
+  # @overload select(range)
+  #   @param [Array] range as Array, e.g. [0, "+inf"]
   # @param [Hash] options
   # @option [Boolean] with_scores
   #   Return with scores, defaults to true
@@ -125,8 +135,10 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   end
 
   # Selects members between a score +range+. Higher scores returned first
-  # @param [Range] range
-  #   The score range of the elements
+  # @overload rselect(range)
+  #   @param [Range] range The score range of the elements
+  # @overload rselect(range)
+  #   @param [Array] range as Array, e.g. [0, "+inf"]
   # @param [Hash] options
   # @option [Boolean] with_scores
   #   Return with scores, defaults to true

@@ -46,6 +46,8 @@ describe Redpear::Store::SortedSet do
     subject.add('c', 3)
     subject.count(1..2).should be(2)
     subject.count(1...2).should be(1)
+    subject.count([2, "+inf"]).should be(2)
+    subject.count(["-inf", "+inf"]).should be(3)
   end
 
   it 'should add values' do
@@ -122,7 +124,9 @@ describe Redpear::Store::SortedSet do
     subject.add('c', 10)
     subject.select(5..25).should be_instance_of(Array)
     subject.select(5..25).to_a.should == [['c', 10], ['b', 20]]
+    subject.select([15, "+inf"]).to_a.should == [["b", 20.0], ["a", 30.0]]
     subject.rselect(5..25).to_a.should == [['b', 20], ['c', 10]]
+    subject.rselect(["-inf", 20]).to_a.should == [["b", 20.0], ["c", 10.0]]
     subject.select(5..25, :with_scores => false, :limit => 1).to_a.should == ['c']
   end
 

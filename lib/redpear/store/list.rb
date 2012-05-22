@@ -26,6 +26,10 @@ class Redpear::Store::List < Redpear::Store::Enumerable
   #   Returns items from range
   #   @param [Range] range
   #   @return [Array] items
+  # @overload slice(range)
+  #   Returns items from range
+  #   @param [Array] range, e.g. [0, "+inf"]
+  #   @return [Array] items
   def slice(start, length = nil)
     case start
     when Integer
@@ -34,7 +38,7 @@ class Redpear::Store::List < Redpear::Store::Enumerable
       else
         conn.lindex(key, start) rescue nil
       end
-    when Range
+    when Range, Array
       range *range_pair(start)
     else
       []
@@ -46,7 +50,7 @@ class Redpear::Store::List < Redpear::Store::Enumerable
   # @overload slice(start, length)
   def slice!(start, length = nil)
     case start
-    when Range
+    when Range, Array
       trim *range_pair(start)
     else
       trim(start, start + length - 1)
