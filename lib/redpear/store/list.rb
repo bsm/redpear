@@ -26,10 +26,6 @@ class Redpear::Store::List < Redpear::Store::Enumerable
   #   Returns items from range
   #   @param [Range] range
   #   @return [Array] items
-  # @overload slice(range)
-  #   Returns items from range
-  #   @param [Array] range, e.g. [0, "+inf"]
-  #   @return [Array] items
   def slice(start, length = nil)
     case start
     when Integer

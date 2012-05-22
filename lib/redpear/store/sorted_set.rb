@@ -24,10 +24,7 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   alias_method :size, :length
 
   # Returns items from range
-  # @overload count(range)
-  #   @param [Range] range
-  # @overload count(range)
-  #   @param [Array] range, e.g. [0, "+inf"]
+  # @param [Range] range
   # @return [Integer] the number of items within given score `range`
   def count(range)
     conn.zcount key, *range_pair(range)
@@ -89,10 +86,7 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   end
 
   # Returns a slice of members between index +range+, with the lower index returned first
-  # @overload slice(range)
-  #   @param [Range] range
-  # @overload slice(range)
-  #   @param [Array] range, e.g. [0, "+inf"]
+  # @param [Range] range
   # @param [Hash] options
   # @option [Boolean] with_scores
   #   Return with scores, defaults to true
@@ -104,10 +98,7 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   alias_method :top, :slice
 
   # Returns a slice of members between rindex +range+, with the higher index returned first
-  # @overload rslice(range)
-  #   @param [Range] range The rindex range of the elements
-  # @overload rslice(range)
-  #   @param [Array] range as Array, e.g. [0, "+inf"]
+  # @param [Range] range The rindex range of the elements
   # @param [Hash] options
   # @option [Boolean] with_scores
   #   Return with scores, defaults to true
@@ -122,7 +113,7 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   # @overload select(range)
   #   @param [Range] range The score range of the elements
   # @overload select(range)
-  #   @param [Array] range as Array, e.g. [0, "+inf"]
+  #   @param [Array] range as Array, e.g. ["-inf", "+inf"]
   # @param [Hash] options
   # @option [Boolean] with_scores
   #   Return with scores, defaults to true
@@ -138,7 +129,7 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   # @overload rselect(range)
   #   @param [Range] range The score range of the elements
   # @overload rselect(range)
-  #   @param [Array] range as Array, e.g. [0, "+inf"]
+  #   @param [Array] range as Array, e.g. ["-inf", "+inf"]
   # @param [Hash] options
   # @option [Boolean] with_scores
   #   Return with scores, defaults to true
@@ -146,7 +137,7 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   #   Limit the results
   # @return [Array] the members
   def rselect(range, options = {})
-    start, finish = range_pair(range)
+    finish, start = range_pair(range, true)
     fetch_range :zrevrangebyscore, finish, start, options
   end
 

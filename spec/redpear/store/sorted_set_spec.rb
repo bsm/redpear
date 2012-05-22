@@ -126,7 +126,7 @@ describe Redpear::Store::SortedSet do
     subject.select(5..25).to_a.should == [['c', 10], ['b', 20]]
     subject.select([15, "+inf"]).to_a.should == [["b", 20.0], ["a", 30.0]]
     subject.rselect(5..25).to_a.should == [['b', 20], ['c', 10]]
-    subject.rselect(["-inf", 20]).to_a.should == [["b", 20.0], ["c", 10.0]]
+    subject.rselect([20, "-inf"]).to_a.should == [["b", 20.0], ["c", 10.0]]
     subject.select(5..25, :with_scores => false, :limit => 1).to_a.should == ['c']
   end
 
