@@ -214,11 +214,9 @@ class Redpear::Model < Hash
   # @return [Boolean] true if successful
   def destroy
     before_destroy
-    self.class.transaction do
-      lookups.each {|l| l.delete(id) }
-      attributes.purge!
-      after_destroy
-    end
+    lookups.each {|l| l.delete(id) }
+    attributes.purge!
+    after_destroy
     freeze
   end
 
