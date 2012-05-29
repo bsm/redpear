@@ -7,11 +7,14 @@ class Redpear::Connection
 
   MASTER_METHODS = [
     :append, :blpop, :brpop, :brpoplpush, :decr, :decrby, :del, :discard,
-    :exec, :expire, :expireat, :getset, :hset, :hsetnx, :hincrby, :hmset,
-    :hdel, :incr, :incrby, :linsert, :lpop, :lpush, :lpushx, :lrem, :lset,
-    :ltrim, :mapped_hmset, :mapped_mset, :mapped_msetnx, :move, :mset, :msetnx,
+    :eval, :evalsha, :exec, :expire, :expireat, :getset,
+    :hset, :hsetnx, :hincrby, :hmset, :hdel, :hincrbyfloat,
+    :incr, :incrby, :incrbyfloat,
+    :linsert, :lpop, :lpush, :lpushx, :lrem, :lset, :ltrim,
+    :mapped_hmset, :mapped_mset, :mapped_msetnx, :move, :mset, :msetnx,
     :multi, :persist, :pipelined, :rename, :renamenx, :rpop, :rpoplpush,
-    :rpush, :rpushx, :sadd, :sdiffstore, :set, :setbit, :setex, :setnx,
+    :pexpire, :pexpireat, :psetex, :pttl, :rpush, :rpushx,
+    :sadd, :script, :sdiffstore, :set, :setbit, :setex, :setnx,
     :setrange, :sinterstore, :smove, :spop, :srem, :sunionstore, :unwatch,
     :watch, :zadd, :zincrby, :zinterstore, :zrem, :zremrangebyrank,
     :zremrangebyscore, :zunionstore, :[]=
@@ -23,9 +26,9 @@ class Redpear::Connection
     :hlen, :hkeys, :hvals, :hgetall, :info, :keys, :lastsave, :lindex, :llen,
     :lrange, :mapped_hmget, :mapped_mget, :mget, :monitor, :object, :ping,
     :publish, :psubscribe, :punsubscribe, :quit, :randomkey, :save, :scard,
-    :sdiff, :select, :shutdown, :sinter, :sismember, :slaveof, :smembers,
-    :sort, :srandmember, :strlen, :subscribe, :subscribed?, :substr, :sunion,
-    :sync, :synchronize, :ttl, :type, :unsubscribe, :zcard, :zcount, :zrange,
+    :sdiff, :select, :shutdown, :sinter, :sismember, :slaveof, :slowlog, :smembers,
+    :sort, :srandmember, :strlen, :subscribe, :subscribed?, :sunion, :sync, :synchronize,
+    :time, :ttl, :type, :unsubscribe, :zcard, :zcount, :zrange,
     :zrangebyscore, :zrank, :zrevrange, :zrevrangebyscore, :zrevrank, :zscore,
     :[]
   ].freeze

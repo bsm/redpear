@@ -43,11 +43,11 @@ describe Redpear::Connection do
 
 
   it 'should have master methods' do
-    described_class::MASTER_METHODS.size.should == 63
+    described_class::MASTER_METHODS.size.should == 72
   end
 
   it 'should have slave methods' do
-    described_class::SLAVE_METHODS.size.should == 68
+    described_class::SLAVE_METHODS.size.should == 69
   end
 
   it 'should have no clashes between methods' do
@@ -55,7 +55,7 @@ describe Redpear::Connection do
   end
 
   it 'should provide a complete set of methods' do
-    irrelevant = [:client, :without_reconnect, :id, :inspect, :method_missing]
+    irrelevant = [:_bpop, :_eval, :client, :id, :inspect, :method_missing, :with_reconnect, :without_reconnect]
     (Redis.public_instance_methods(false) - described_class::MASTER_METHODS - described_class::SLAVE_METHODS).should =~ irrelevant
   end
 

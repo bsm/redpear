@@ -51,8 +51,8 @@ class Redpear::Store::Base
 
   # Watch this key
   # @return [Boolean] true if successful
-  def watch
-    conn.watch(key) == "OK"
+  def watch(&block)
+    conn.watch(key, &block).nil?
   end
 
   # @return [Integer] remaining time-to-live in seconds (if set)

@@ -235,8 +235,7 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
     def fetch_range(method, start, finish, options = {})
       options[:limit]       = [options[:offset] || 0, options[:limit]] if options[:offset] || options[:limit]
       options[:with_scores] = true unless options.key?(:with_scores)
-      result = conn.send method, key, start, finish, options
-      options[:with_scores] ? result.each_slice(2).map {|m,s| [m, s.to_f] } : result
+      conn.send method, key, start, finish, options
     end
 
 end
