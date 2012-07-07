@@ -1,6 +1,5 @@
 rvm:
   - 1.9.3
-  - jruby-18mode
   - jruby-19mode
   - jruby-1.7.0.preview1
 before_install:
@@ -12,8 +11,6 @@ env:
   - CONN=ruby
 matrix:
   exclude:
-    - rvm: jruby-18mode
-      env: CONN=hiredis
     - rvm: jruby-19mode
       env: CONN=hiredis
     - rvm: jruby-1.7.0.preview1
