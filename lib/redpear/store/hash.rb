@@ -30,7 +30,12 @@ class Redpear::Store::Hash < Redpear::Store::Enumerable
 
   # @return [Boolean] true, if empty
   def empty?
-    length.zero?
+    case value = length
+    when Redis::Future
+      value.instance_eval { @transformation = IS_ZERO }
+    else
+      value.zero?
+    end
   end
 
   # @param [String] field
@@ -70,7 +75,6 @@ class Redpear::Store::Hash < Redpear::Store::Enumerable
   def length
     conn.hlen key
   end
-  alias_method :size, :length
 
   # @param [String] field
   #   The field to increment
@@ -97,9 +101,13 @@ class Redpear::Store::Hash < Redpear::Store::Enumerable
 
   # @param [Hash] hash
   #   The pairs to update
-  def update(hash)
-    merge!(hash)
-    to_hash
+  def update(hash)   
+    case result = merge!(hash) 
+    when Redis::Future
+      result
+    else
+      to_hash
+    end
   end
 
   # @param [Hash] hash

@@ -20,20 +20,20 @@ describe Redpear::Connection do
   end
 
   it "should accept transactions" do
-    subject.transaction do
+    subject.multi do
       subject.hset 'hash', 'a', 1
       subject.hset 'hash', 'b', 2
     end
     subject.hgetall('hash').should == { 'a' => '1', 'b' => '2' }
   end
 
-  it "should prevent transaction nesting" do
-    subject.transaction do
+  it "should work with nested transactions" do
+    subject.multi do
       subject.hset 'hash', 'a', 1
       subject.hset 'hash', 'b', 2
-      subject.transaction do
+      subject.multi do
         subject.hset 'hash', 'c', 3
-        subject.transaction do
+        subject.multi do
           subject.hset 'hash', 'd', 4
         end
       end

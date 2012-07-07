@@ -30,7 +30,7 @@ end
 module RSpec::ConnectionHelperMethods
 
   def connection
-    @connection ||= Redpear::Connection.new
+    @connection ||= Redis.current
   end
 
 end
@@ -38,6 +38,7 @@ end
 RSpec.configure do |config|
   config.include RSpec::ConnectionHelperMethods
   config.after do
+    connection.unwatch
     connection.flushdb
   end
 end

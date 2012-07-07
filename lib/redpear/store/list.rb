@@ -45,13 +45,18 @@ class Redpear::Store::List < Redpear::Store::Enumerable
   # Destructive slice. Returns specified range and removes other items.
   # @overload slice(start, length)
   def slice!(start, length = nil)
-    case start
+    result = case start
     when Range, Array
       trim *range_pair(start)
     else
       trim(start, start + length - 1)
     end
-    to_a
+    case result
+    when Redis::Future
+      result
+    else
+      to_a
+    end
   end
 
   # @param [Integer] start
@@ -71,7 +76,6 @@ class Redpear::Store::List < Redpear::Store::Enumerable
   def length
     conn.llen key
   end
-  alias_method :size, :length
 
   # Appends a single item. Chainable example:
   #   list << 'a' << 'b'

@@ -135,4 +135,26 @@ describe Redpear::Store::Hash do
     subject.inspect.should == %(#<Redpear::Store::Hash hash:key: {"a"=>"b"}>)
   end
 
+  it 'should be pipelineable' do
+    connection.pipelined do
+      subject.all
+      subject.store('a', 'b')
+      subject.keys
+      subject.values
+      subject.length
+      subject.key?('a')
+      subject.key?('b')
+      
+      subject.delete('a')
+      subject.empty?
+      subject.update('b' => 1, 'c' => 2)
+      subject.increment('b')
+      subject.decrement('c')
+      subject.values_at("b", "c")
+    end.should == [
+      {}, true, ["a"], ["b"], 1, true, false, 
+      1, true, "OK", 2, 1, ["2", "1"]
+    ]
+  end
+
 end

@@ -5,7 +5,7 @@ describe Redpear::Model do
   describe "connection" do
 
     it 'should have a default' do
-      User.connection.should be_instance_of(Redpear::Connection)
+      User.connection.should be_instance_of(Redis)
     end
 
     it 'can have a custom' do

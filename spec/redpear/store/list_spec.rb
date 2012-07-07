@@ -101,4 +101,24 @@ describe Redpear::Store::List do
     subject.should == ['b', 'c']
   end
 
+  it 'should be pipelineable' do
+    connection.pipelined do
+      subject.all
+      subject << 'a' << 'b'
+      subject.to_a
+      subject.insert_after('a', 'c')
+      subject.insert_before('c', 'd')
+      subject.length
+
+      subject[1, 2]
+      subject.slice!(1, 3)
+      subject.pop
+      subject.unshift('e')
+      subject.shift
+    end.should == [
+      [], 1, 2, ["a", "b"], 3, 4, 4, 
+      ["d", "c"], "OK", "b", 3, "e"
+    ]
+  end
+
 end

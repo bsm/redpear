@@ -32,15 +32,15 @@ class Redpear::Model < Hash
 
     alias_method :create, :new
 
-    # @param [Redpear::Connection] define a custom connection
+    # @param [Redis] define a custom connection
     attr_writer :connection
 
     # @param [String] define a custom scope
     attr_writer :scope
 
-    # @return [Redpear::Connection] the connection
+    # @return [Redis] the connection
     def connection
-      @connection ||= (superclass.respond_to?(:connection) ? superclass.connection : Redpear::Connection.new)
+      @connection ||= (superclass.respond_to?(:connection) ? superclass.connection : Redis.current)
     end
 
     # @return [String] the scope of this model. Example:
@@ -69,10 +69,16 @@ class Redpear::Model < Hash
       @_pk_counter ||= Redpear::Store::Counter.new nested_key(:+), connection
     end
 
-    # Runs a bulk-operation.
+    # Runs a transactional bulk-operation.
     # @yield operations that should be run in the transaction
     def transaction(&block)
-      connection.transaction(&block)
+      connection.multi(&block)
+    end
+
+    # Runs a bulk-operation.
+    # @yield operations that should be run as bulk
+    def pipelined(&block)
+      connection.pipelined(&block)
     end
 
     # Destroys a record. Example:

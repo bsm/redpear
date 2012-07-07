@@ -21,7 +21,6 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   def length
     conn.zcard key
   end
-  alias_method :size, :length
 
   # Returns items from range
   # @param [Range] range
@@ -45,8 +44,7 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   # @param [String] member
   # @return [Integer] the score for the given `member`
   def score(member)
-    number = conn.zscore(key, member)
-    number.to_f if number
+    conn.zscore(key, member)
   end
   alias_method :[], :score
 
@@ -54,8 +52,7 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   # @param [String] member
   # @return [Integer] the index for the given `member`
   def index(member)
-    number = conn.zrank(key, member)
-    number.to_i if number
+    conn.zrank(key, member)
   end
   alias_method :rank, :index
 
@@ -63,8 +60,7 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   # @param [String] member
   # @return [Integer] the index for the given `member`
   def rindex(member)
-    number = conn.zrevrank(key, member)
-    number.to_i if number
+    conn.zrevrank(key, member)
   end
   alias_method :rrank, :rindex
 
@@ -76,13 +72,23 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
 
   # @return [Boolean] true, if member is included
   def include?(member)
-    !!conn.zscore(key, member)
+    case value = conn.zscore(key, member)
+    when Redis::Future
+      value.instance_eval { @transformation = IS_TRUE }
+    else
+      !!value
+    end
   end
   alias_method :member?, :include?
 
   # @return [Boolean] true, if empty
   def empty?
-    length.zero?
+    case value = length
+    when Redis::Future
+      value.instance_eval { @transformation = IS_ZERO }
+    else
+      value.zero?
+    end
   end
 
   # Returns a slice of members between index +range+, with the lower index returned first
@@ -153,7 +159,12 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   #   Return with scores, defaults to true
   # @return [Array] member + score for given `index`.
   def at(index, options = {})
-    slice(index..index, options).first
+    case value = slice(index..index, options)
+    when Redis::Future
+      value.instance_eval { @transformation = PICK_FIRST }
+    else
+      value.first
+    end
   end
 
   # @return [String] member with the lowest index
@@ -218,14 +229,16 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   #   The member to increment
   # @param [Integer] by
   #   The increment, defaults to 1
+  # @return [Float] the new value
   def increment(member, by = 1)
-    conn.zincrby(key, by, member).to_f
+    conn.zincrby(key, by, member)
   end
 
   # @param [String] member
   #   The member to decrement
   # @param [Integer] by
   #   The decrement, defaults to 1
+  # @return [Float] the new value
   def decrement(member, by = 1)
     increment member, -by
   end

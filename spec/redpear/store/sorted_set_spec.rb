@@ -197,4 +197,34 @@ describe Redpear::Store::SortedSet do
     subject['a'].should == 2
   end
 
+  it 'should be pipelineable' do
+    connection.pipelined do
+      subject.add('a', 10)
+      subject['b'] = 20
+      subject.to_a
+      subject.size
+      subject.count(5..15)
+
+      subject.select(5..15)      
+      subject.score('a')
+      subject.score('c')
+      subject.index('b')
+      subject.rindex('c')
+      subject.minimum
+      subject.maximum
+      subject.delete('b')
+
+      subject.include?('a')
+      subject.include?('b')
+      subject.empty?
+      subject.slice(0..1)
+      subject.at(0)
+      subject.increment("a", 4)
+    end.should == [
+      true, true, [["a", 10.0], ["b", 20.0]], 2, 1, 
+      [["a", 10.0]], 10.0, nil, 1, nil, "a", "b", true, 
+      true, false, false, [["a", 10.0]], "a", 14.0
+    ]
+  end
+
 end

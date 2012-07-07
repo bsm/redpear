@@ -1,8 +1,28 @@
 rvm:
-  - 1.9.2
   - 1.9.3
+  - jruby-18mode
+  - jruby-19mode
+  - jruby-1.7.0.preview1
 gemfile:
   - Gemfile
 env:
   - CONN=hiredis
   - CONN=ruby
+jdk:
+  - openjdk6
+  - openjdk7
+  - oraclejdk7
+matrix:
+  exclude:
+    - rvm: 1.9.3
+      jdk: openjdk6
+    - rvm: 1.9.3
+      jdk: openjdk7
+    - rvm: 1.9.3
+      jdk: oraclejdk7
+    - rvm: jruby-18mode
+      env: CONN=hiredis
+    - rvm: jruby-19mode
+      env: CONN=hiredis
+    - rvm: jruby-1.7.0.preview1
+      env: CONN=hiredis

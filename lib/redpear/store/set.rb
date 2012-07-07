@@ -10,14 +10,19 @@ class Redpear::Store::Set < Redpear::Store::Enumerable
 
   # @return [Set] all members
   def all
-    members.to_set
+    case value = members
+    when Redis::Future
+      value.instance_eval { @transformation = TO_SET }
+    else
+      value.to_set
+    end    
   end
   alias_method :to_set, :all
   alias_method :value, :all
 
   # @return [Array] the array of members
   def members
-    conn.smembers(key) || []
+    conn.smembers(key)
   end
   alias_method :to_a, :members
 
@@ -25,7 +30,6 @@ class Redpear::Store::Set < Redpear::Store::Enumerable
   def length
     conn.scard key
   end
-  alias_method :size, :length
 
   # Adds a single value. Chainable example:
   #   set << 'a' << 'b'
@@ -52,7 +56,12 @@ class Redpear::Store::Set < Redpear::Store::Enumerable
 
   # @return [Boolean] true, if empty
   def empty?
-    length.zero?
+    case value = length
+    when Redis::Future
+      value.instance_eval { @transformation = IS_ZERO }
+    else
+      value.zero?
+    end
   end
 
   # Removes a random value

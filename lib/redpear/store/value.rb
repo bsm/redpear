@@ -43,12 +43,22 @@ class Redpear::Store::Value < Redpear::Store::Base
   # @param [String] other
   # @return [Boolean] true, if equals `other`
   def ==(other)
-    value == other
+    case value = self.value
+    when Redis::Future
+      value.instance_eval { @transformation = Kernel.lambda {|v| v == other } }
+    else      
+      value == other
+    end
   end
 
   # @return [Boolean] true, if value is nil
   def nil?
-    value.nil?
+    case value = self.value
+    when Redis::Future
+      value.instance_eval { @transformation = IS_NIL }
+    else      
+      value.nil?
+    end
   end
 
   # @return [Boolean] true, if responds to `method`

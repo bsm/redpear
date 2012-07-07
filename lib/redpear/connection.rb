@@ -57,8 +57,7 @@ class Redpear::Connection
   #   The (optional) slave connection, defaults to master
   def initialize(master = Redis.current, slave = nil)
     @master = _connect(master)
-    @slave  = _connect(slave || master)
-    @transaction = nil
+    @slave  = slave ? _connect(slave) : @master
   end
 
   # @param [Symbol] name
@@ -72,20 +71,6 @@ class Redpear::Connection
     yield(@current)
   ensure
     @current = nil
-  end
-
-  # Run a transaction, prevents accidental transaction nesting
-  def transaction(&block)
-    if @transaction
-      yield
-    else
-      begin
-        @transaction = true
-        multi(&block)
-      ensure
-        @transaction = nil
-      end
-    end
   end
 
   MASTER_METHODS.each do |meth|

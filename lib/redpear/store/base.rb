@@ -2,12 +2,20 @@ require 'securerandom'
 
 class Redpear::Store::Base
 
+  # Transforamtions
+  IS_NIL     = lambda {|v| v.nil? }.freeze
+  IS_ZERO    = lambda {|v| v.zero? }.freeze
+  IS_TRUE    = lambda {|v| !!v }.freeze
+  TO_INT     = lambda {|v| v.to_i }.freeze
+  TO_SET     = lambda {|v| v.to_set }.freeze
+  PICK_FIRST = lambda {|v| v.first }.freeze
+
   attr_reader :key, :conn
 
   # Creates and yields over a temporary key.
   # Useful in combination with e.g. `interstore`, `unionstore`, etc.
   #
-  # @param [Redpear::Connection] conn
+  # @param [Redis] conn
   #   The connection
   # @param [Hash] options
   #   The options hash
@@ -32,7 +40,7 @@ class Redpear::Store::Base
   # Constructor
   # @param [String] key
   #   The storage key
-  # @param [Redpear::Connection] conn
+  # @param [Redis] conn
   #   The connection
   def initialize(key, conn)
     @key, @conn = key, conn

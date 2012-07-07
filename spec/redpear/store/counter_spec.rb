@@ -33,5 +33,14 @@ describe Redpear::Store::Counter do
     subject.should == 3
   end
 
+  it 'should be pipelineable' do
+    connection.pipelined do
+      subject.get
+      subject.set 6
+      subject.get
+      subject.increment
+      subject.decrement(2)
+    end.should == [0, "OK", 6, 7, 5]
+  end
 
 end

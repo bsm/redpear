@@ -15,7 +15,7 @@ class User < Redpear::Model
   column :name
 end
 
-class ManagerConnection < Redpear::Connection
+class ManagerConnection < Redis
 end
 
 class Employee < User

@@ -132,4 +132,23 @@ describe Redpear::Store::Set do
     subject.should == ['b']
   end
 
+  it 'should be pipelineable' do
+    connection.pipelined do
+      subject << 'a' << 'b'
+      subject.all
+      subject.to_a
+      subject.length
+
+      subject.empty?
+      subject.include?("a")
+      subject.include?("c")
+      subject.delete("b")
+      subject.random
+      subject.pop
+    end.should == [
+      true, true, ["a", "b"].to_set, ["a", "b"], 2, 
+      false, true, false, true, "a", "a"      
+    ]
+  end
+
 end

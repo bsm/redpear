@@ -65,4 +65,25 @@ describe Redpear::Store::Value do
     subject.reverse.should == "dcba"
   end
 
+  it 'should be pipelineable' do
+    connection.pipelined do
+      subject.nil?
+      subject.get
+      subject.set "ab"
+      subject.nil?
+      subject.get
+      subject.value = "cd"
+      subject == "cd"
+      subject.append 'e'
+      subject == "cd"
+      subject.exists?
+      subject.delete
+      subject.exists?
+    end.should == [
+      true, nil, "OK", false, 
+      "ab", "OK", true, 3, false, 
+      true, 1, false
+    ]
+  end
+
 end

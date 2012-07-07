@@ -1,8 +1,13 @@
 class Redpear::Store::Counter < Redpear::Store::Value
-
+  
   # @return [Integer] the value
   def get
-    super.to_i
+    case value = super
+    when Redis::Future
+      value.instance_eval { @transformation = TO_INT }
+    else
+      value.to_i
+    end
   end
 
   # Sets the value
