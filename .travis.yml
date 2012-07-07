@@ -1,12 +1,9 @@
 language: ruby
 
-before_install:
-  - rvm install jruby-1.7.0.preview1
-
 rvm:
   - 1.9.3
   - jruby-19mode
-  - jruby-1.7.0.preview1
+  - jruby-head
 gemfile:
   - .travis/Gemfile
 env:
@@ -15,7 +12,7 @@ env:
 
 matrix:
   exclude:
-    - rvm: jruby-1.7.0.preview1
+    - rvm: jruby-head
       gemfile: .travis/Gemfile
       env: CONN=hiredis
     - rvm: jruby-19mode
