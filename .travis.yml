@@ -3,6 +3,8 @@ rvm:
   - jruby-18mode
   - jruby-19mode
   - jruby-1.7.0.preview1
+before_install:
+  - rvm install jruby-1.7.0.preview1
 gemfile:
   - Gemfile
 env:
