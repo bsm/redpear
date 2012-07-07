@@ -1,0 +1,8 @@
+source 'http://rubygems.org'
+
+gemspec :path => "../"
+
+case ENV["CONN"]
+when "hiredis"
+  gem "hiredis"
+end
