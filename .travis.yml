@@ -8,18 +8,8 @@ gemfile:
 env:
   - CONN=hiredis
   - CONN=ruby
-jdk:
-  - openjdk6
-  - openjdk7
-  - oraclejdk7
 matrix:
   exclude:
-    - rvm: 1.9.3
-      jdk: openjdk6
-    - rvm: 1.9.3
-      jdk: openjdk7
-    - rvm: 1.9.3
-      jdk: oraclejdk7
     - rvm: jruby-18mode
       env: CONN=hiredis
     - rvm: jruby-19mode
