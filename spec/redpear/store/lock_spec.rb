@@ -10,6 +10,10 @@ describe Redpear::Store::Lock do
     Redpear::Store::Value.new 'value:key', connection
   end
 
+  let :counter do
+    Redpear::Store::Counter.new 'counter:key', connection
+  end
+
   before do
     subject.stub! :sleep
   end
@@ -91,10 +95,40 @@ describe Redpear::Store::Lock do
 
     it 'should not fail if lock cannot be obtained' do
       set_current(0.01)
-      ok = subject.lock(:wait_timeout => 0) {}
+      ok = subject.lock?(:wait_timeout => 0) {}
       ok.should be(false)
     end
 
   end
 
+  describe "reservations" do
+
+    it 'should reserve and execute a block' do
+      ts = Time.now.to_f
+      subject.reserve(10) { value.set "true" }.should == "OK"
+      value.get.should == "true"
+      subject.value.to_f.should be_within(1).of(ts + 10)
+    end
+
+    it 'should clear after execution if requested' do
+      ts = Time.now.to_f
+      subject.reserve(10, :clear => true) { value.set "true" }.should == "OK"
+      value.get.should == "true"
+      subject.should_not be_exists
+    end
+
+    it 'should not execute of already reserved' do
+      set_current(10)
+      subject.reserve(20) { value.set "true" }.should be_nil
+      value.get.should be_nil
+    end
+
+    it 'should prevent parallel execution' do
+      t1 = Thread.new { subject.reserve(5) { counter.increment } }
+      t2 = Thread.new { subject.reserve(5) { counter.increment } }
+      [t1, t2].each(&:join)
+      counter.get.should == 1
+    end
+
+  end
 end

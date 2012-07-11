@@ -81,6 +81,41 @@ class Redpear::Store::Lock < Redpear::Store::Base
     false
   end
 
+  # Reserves a lock and yields a transaction, but only if not reserved by
+  # someone else. This is useful when processes can be triggered by concurrent
+  # threads, but should only be executed once.
+  #
+  # @example Calling `execute_once` method only once
+  #
+  #   def execute_once
+  #     # Do something
+  #   end
+  #
+  #   t1 = Thread.new do
+  #     lock = Redpear::Store::Lock.new "locks:reservation", connection
+  #     lock.reserve(60) { execute_once } # Reserve for max. 60 seconds
+  #   end
+  #
+  #   t2 = Thread.new do
+  #     lock = Redpear::Store::Lock.new "locks:reservation", connection
+  #     lock.reserve(60) { execute_once }
+  #   end
+  #
+  #   t1.join
+  #   t2.join
+  #
+  # @param [Integer] seconds the number of seconds
+  # @param [Hash] options
+  # @option [Boolean] options :clear
+  #   Clear the lock after execution, defaults to false
+  # @yield [] processes the block within the lock
+  def reserve(seconds, options = {})
+    timestamp = to_time(seconds).to_f
+    yield if lock_obtained?(timestamp) || expired_lock_obtained?(timestamp)
+  ensure
+    purge! if options[:clear]
+  end
+
   protected
 
     # @param [Float] timestamp
