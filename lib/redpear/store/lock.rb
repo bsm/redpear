@@ -24,7 +24,9 @@ class Redpear::Store::Lock < Redpear::Store::Base
     conn.get key
   end
 
-  # Creates a lock and yields a transaction. Example:
+  # Creates a lock and yields a transaction.
+  #
+  # @example
   #
   #   sender    = Redpear::Store::Hash.new "accounts:sender", connection
   #   recipient = Redpear::Store::Hash.new "accounts:recipient", connection
@@ -41,6 +43,7 @@ class Redpear::Store::Lock < Redpear::Store::Base
   # @option [Integer] wait_timeout
   #   Wait for `wait_timeout` seconds to obtain a lock, before timing out. Defaults to 2.
   # @yield [] processes the block within the lock
+  # @raise [Redpear::Store::Lock::LockTimeout] timeout error if lock cannot be ontained
   def lock(options = {})
     options   = self.class.default_options.merge(options)
     result    = nil
@@ -65,6 +68,17 @@ class Redpear::Store::Lock < Redpear::Store::Base
     result
   ensure
     purge! if timestamp && timestamp > Time.now.to_f
+  end
+
+  # Conditional locking. Performs a transaction if lock can be acquired.
+  # @param [Hash] options - see #lock
+  # @yield [] processes the block within the lock
+  # @return [Boolean] true if successful
+  def lock?(options = {}, &block)
+    lock(options, &block)
+    true
+  rescue LockTimeout
+    false
   end
 
   protected
