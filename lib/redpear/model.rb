@@ -1,4 +1,5 @@
 require 'redpear'
+require 'redpear/schema'
 
 =begin
 Redis is a simple key/value store, hence storing structured data can be a
@@ -21,8 +22,8 @@ Redpear::Model is VERY lightweight. It is optimised for raw speed at the
 expense of convenience.
 =end
 class Redpear::Model < Hash
-  autoload :Finders, 'redpear/model/finders'
-  autoload :Expiration, 'redpear/model/expiration'
+  require 'redpear/model/finders'
+  require 'redpear/model/expiration'
 
   include Redpear::Schema
   include Finders

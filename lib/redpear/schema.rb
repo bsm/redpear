@@ -1,8 +1,4 @@
 module Redpear::Schema
-  autoload :Collection, 'redpear/schema/collection'
-  autoload :Column, 'redpear/schema/column'
-  autoload :Index, 'redpear/schema/index'
-  autoload :Score, 'redpear/schema/score'
   extend Redpear::Concern
 
   module ClassMethods
@@ -41,4 +37,8 @@ module Redpear::Schema
       end
 
   end
+end
+
+%w|collection column index score|.each do |name|
+  require "redpear/schema/#{name}"
 end

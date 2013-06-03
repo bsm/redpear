@@ -106,7 +106,7 @@ describe Redpear::Store::Base do
 
   it 'should allow to watch a key' do
     record.watch.should be(true)
-    record.watch {}.should be(true) # with block
+    record.watch { }.should be(true) # with block
   end
 
   it 'should allow purging records' do
