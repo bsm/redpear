@@ -102,12 +102,8 @@ class Redpear::Store::Hash < Redpear::Store::Enumerable
   # @param [Hash] hash
   #   The pairs to update
   def update(hash)
-    case result = merge!(hash)
-    when Redis::Future
-      result
-    else
-      to_hash
-    end
+    result = merge!(hash)
+    Redis::Future === result ? result : to_hash
   end
 
   # @param [Hash] hash

@@ -80,9 +80,9 @@ describe Redpear::Store::Value do
       subject.delete
       subject.exists?
     end.should == [
-      true, nil, "OK", false, 
-      "ab", "OK", true, 3, false, 
-      true, 1, false
+      true, nil, "OK", false,
+      "ab", "OK", true, 3, false,
+      true, true, false
     ]
   end
 

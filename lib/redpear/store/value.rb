@@ -45,8 +45,8 @@ class Redpear::Store::Value < Redpear::Store::Base
   def ==(other)
     case value = self.value
     when Redis::Future
-      value.instance_eval { @transformation = Kernel.lambda {|v| v == other } }
-    else      
+      value.instance_eval { @transformation = ->v { v == other } }
+    else
       value == other
     end
   end
@@ -56,7 +56,7 @@ class Redpear::Store::Value < Redpear::Store::Base
     case value = self.value
     when Redis::Future
       value.instance_eval { @transformation = IS_NIL }
-    else      
+    else
       value.nil?
     end
   end

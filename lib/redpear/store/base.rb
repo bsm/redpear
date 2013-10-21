@@ -3,12 +3,13 @@ require 'securerandom'
 class Redpear::Store::Base
 
   # Transforamtions
-  IS_NIL     = lambda {|v| v.nil? }.freeze
-  IS_ZERO    = lambda {|v| v.zero? }.freeze
-  IS_TRUE    = lambda {|v| !!v }.freeze
-  TO_INT     = lambda {|v| v.to_i }.freeze
-  TO_SET     = lambda {|v| v.to_set }.freeze
-  PICK_FIRST = lambda {|v| v.first }.freeze
+  IS_NIL     = ->v { v.nil? }.freeze
+  IS_ZERO    = ->v { v.zero? }.freeze
+  IS_ONE     = ->v { v == 1 }.freeze
+  IS_TRUE    = ->v { !!v }.freeze
+  TO_INT     = ->v { v.to_i }.freeze
+  TO_SET     = ->v { v.to_set }.freeze
+  PICK_FIRST = ->v { v.first }.freeze
 
   attr_reader :key, :conn
 
@@ -54,7 +55,7 @@ class Redpear::Store::Base
 
   # @return [Boolean] true if the record exists
   def exists?
-    !!conn.exists(key)
+    conn.exists(key)
   end
 
   # Watch this key
@@ -96,7 +97,12 @@ class Redpear::Store::Base
 
   # Deletes the whole record
   def purge!
-    conn.del(key) == 1
+    case value = conn.del(key)
+    when Redis::Future
+      value.instance_eval { @transformation = IS_ONE }
+    else
+      value == 1
+    end
   end
 
   # Deletes the record and returns the value

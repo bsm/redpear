@@ -51,12 +51,7 @@ class Redpear::Store::List < Redpear::Store::Enumerable
     else
       trim(start, start + length - 1)
     end
-    case result
-    when Redis::Future
-      result
-    else
-      to_a
-    end
+    Redis::Future === result ? result : to_a
   end
 
   # @param [Integer] start

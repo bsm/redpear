@@ -9,7 +9,7 @@ class Redpear::Store::Lock < Redpear::Store::Base
     #
     # @return [Hash] default options
     def default_options
-      @default_options ||= { :lock_timeout => 2, :wait_timeout => 2 }
+      @default_options ||= { lock_timeout: 2, wait_timeout: 2 }
     end
 
   end
