@@ -15,7 +15,7 @@ class Redpear::Store::Set < Redpear::Store::Enumerable
       value.instance_eval { @transformation = TO_SET }
     else
       value.to_set
-    end    
+    end
   end
   alias_method :to_set, :all
   alias_method :value, :all
@@ -50,7 +50,7 @@ class Redpear::Store::Set < Redpear::Store::Enumerable
 
   # @return [Boolean] true, if value is included
   def include?(value)
-    !!conn.sismember(key, value)
+    conn.sismember(key, value)
   end
   alias_method :member?, :include?
 

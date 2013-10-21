@@ -22,7 +22,7 @@ class Redpear::Store::Hash < Redpear::Store::Enumerable
 
   # @return [Boolean] true, if field exists
   def key?(field)
-    !!conn.hexists(key, field)
+    conn.hexists(key, field)
   end
   alias_method :has_key?, :key?
   alias_method :member?, :key?
@@ -101,8 +101,8 @@ class Redpear::Store::Hash < Redpear::Store::Enumerable
 
   # @param [Hash] hash
   #   The pairs to update
-  def update(hash)   
-    case result = merge!(hash) 
+  def update(hash)
+    case result = merge!(hash)
     when Redis::Future
       result
     else
