@@ -15,7 +15,7 @@ describe Redpear::Store::Lock do
   end
 
   before do
-    subject.stub! :sleep
+    subject.stub :sleep
   end
 
   def set_current(offset = 0)
