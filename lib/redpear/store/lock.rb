@@ -147,10 +147,8 @@ class Redpear::Store::Lock < Redpear::Store::Base
       case value
       when Time
         value
-      when Numeric
-        Time.now + value
       else
-        Time.now + 5
+        Time.now + value
       end
     end
 
