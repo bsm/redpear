@@ -102,6 +102,12 @@ describe Redpear::Store::Lock do
   end
 
   describe "reservations" do
+    after { subject.purge! }
+
+    it 'should attempt reservations' do
+      subject.reserve?(10).should be_true
+      subject.reserve?(10).should be_false
+    end
 
     it 'should reserve and execute a block' do
       ts = Time.now.to_f

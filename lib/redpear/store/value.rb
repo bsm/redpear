@@ -15,7 +15,7 @@ class Redpear::Store::Value < Redpear::Store::Base
   end
 
   # Sets the value
-  # @param [String] the value to set
+  # @param [String] value the value to set
   def set(value)
     conn.set(key, value)
   end

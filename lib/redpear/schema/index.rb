@@ -6,7 +6,7 @@ class Redpear::Schema::Index < Redpear::Schema::Column
     members record.send(name)
   end
 
-  # @param [String] index value
+  # @param [String] value index value
   # @return [Redpear::Store::Set] the set holding the IDs for the given `foreign_key`
   def members(value)
     value = '_' if value.nil?

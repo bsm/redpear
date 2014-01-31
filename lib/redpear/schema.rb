@@ -8,21 +8,21 @@ module Redpear::Schema
       @columns ||= Redpear::Schema::Collection.new
     end
 
-    # @param [multiple] the column definition. Please see Redpear::Schema::Column#initialize
+    # @param [multiple] args the column definition. Please see Redpear::Schema::Column#initialize
     def column(*args)
       columns.store(Redpear::Schema::Column, self, *args).tap do |col|
         __define_attribute_accessors__(col)
       end
     end
 
-    # @param [multiple] the index definition. Please see Redpear::Index#initialize
+    # @param [multiple] args the index definition. Please see Redpear::Index#initialize
     def index(*args)
       columns.store(Redpear::Schema::Index, self, *args).tap do |col|
         __define_attribute_accessors__(col)
       end
     end
 
-    # @param [multiple] the sorted index definition. Please see Redpear::ZIndex#initialize
+    # @param [multiple] args the sorted index definition. Please see Redpear::ZIndex#initialize
     def score(*args)
       columns.store(Redpear::Schema::Score, self, *args).tap do |col|
         __define_attribute_accessors__(col)

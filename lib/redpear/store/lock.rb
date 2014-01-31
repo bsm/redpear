@@ -81,6 +81,16 @@ class Redpear::Store::Lock < Redpear::Store::Base
     false
   end
 
+  # Tries to reserve a lock. Low-level method, please see #reserve
+  # for the high-level API.
+  #
+  # @param [Integer] seconds the number of seconds
+  # @return [Boolean] true if lock was reserved
+  def reserve?(seconds)
+    timestamp = to_time(seconds).to_f
+    lock_obtained?(timestamp) || expired_lock_obtained?(timestamp)
+  end
+
   # Reserves a lock and yields a transaction, but only if not reserved by
   # someone else. This is useful when processes can be triggered by concurrent
   # threads, but should only be executed once.
@@ -110,8 +120,7 @@ class Redpear::Store::Lock < Redpear::Store::Base
   #   Clear the lock after execution, defaults to false
   # @yield [] processes the block within the lock
   def reserve(seconds, options = {})
-    timestamp = to_time(seconds).to_f
-    yield if lock_obtained?(timestamp) || expired_lock_obtained?(timestamp)
+    yield if reserve?(seconds)
   ensure
     purge! if options[:clear]
   end

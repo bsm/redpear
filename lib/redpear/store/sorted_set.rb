@@ -196,11 +196,10 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   end
 
   # Store the result of a union in a new +target+ key
-  # @param [Redpear::Store::Set] other
-  #   The other set
+  # @param [Redpear::Store::Set] target
+  #   The target set
   # @param [multiple] others
-  #   The other sets
-  # @param [Hash] options
+  #   The other sets & options
   # @option [Array] weights
   # @option [Symbol] aggregate
   # @return [Redpear::Store::Set] the result set
@@ -214,8 +213,7 @@ class Redpear::Store::SortedSet < Redpear::Store::Enumerable
   # @param [String] target
   #   The target key
   # @param [multiple] others
-  #   The other sets
-  # @param [Hash] options
+  #   The other sets & options
   # @option [Array] weights
   # @option [Symbol] aggregate
   # @return [Redpear::Store::SortedSet] the result set

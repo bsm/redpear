@@ -33,10 +33,10 @@ class Redpear::Model < Hash
 
     alias_method :create, :new
 
-    # @param [Redis] define a custom connection
+    # @attr_writer [Redis] connection define a custom connection
     attr_writer :connection
 
-    # @param [String] define a custom scope
+    # @attr_writer [String] scope define a custom scope
     attr_writer :scope
 
     # @return [Redis] the connection
@@ -90,6 +90,7 @@ class Redpear::Model < Hash
     end
 
     # Allocate an instance
+    # @param [String] id the ID of the record to allocate
     def instantiate(id)
       instance = allocate
       instance.send :store, 'id', id.to_s
@@ -257,14 +258,14 @@ class Redpear::Model < Hash
 
   # Cheap after create callback, override in subclasses and don't forget to
   # call `super()`.
-  # @params [Hash] attrs attributes used on initialization
+  # @param [Hash] attrs attributes used on initialization
   def after_create(attrs)
     self.class.members.add(id)
   end
 
   # Cheap after save callback, override in subclasses and don't forget to
   # call `super()`.
-  # @params [Hash] attrs attributes used on save
+  # @param [Hash] attrs attributes used on save
   def after_save(attrs)
   end
 

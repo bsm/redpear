@@ -10,6 +10,7 @@ gemfile:
 env:
   - CONN=hiredis
   - CONN=ruby
+script: bundle exec rake spec:coveralls
 
 matrix:
   exclude:

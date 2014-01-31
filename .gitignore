@@ -1,3 +1,5 @@
-.project
 *.gem
-.rbx
+.rbx/
+doc/
+.yardoc/
+pkg/

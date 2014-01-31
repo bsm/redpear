@@ -1,5 +1,5 @@
 class Redpear::Store::Counter < Redpear::Store::Value
-  
+
   # @return [Integer] the value
   def get
     case value = super
@@ -11,7 +11,7 @@ class Redpear::Store::Counter < Redpear::Store::Value
   end
 
   # Sets the value
-  # @param [Integer] the value to set
+  # @param [Integer] value the value to set
   def set(value)
     super Kernel::Integer(value)
   end

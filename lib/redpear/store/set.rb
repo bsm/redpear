@@ -102,7 +102,7 @@ class Redpear::Store::Set < Redpear::Store::Enumerable
   alias_method :merge, :union
 
   # Store the result of a union in a new +target+ key
-  # @param [Redpear::Store::Set] other
+  # @param [Redpear::Store::Set] target
   #   The other set
   # @param [multiple] others
   #   The other sets
@@ -112,7 +112,7 @@ class Redpear::Store::Set < Redpear::Store::Enumerable
     self.class.new target.to_s, conn
   end
 
-  # @param [multiple] other
+  # @param [multiple] others
   #   The other sets
   # @return [Array] the intersection +other+ set
   def inter(*others)
