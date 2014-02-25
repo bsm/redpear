@@ -21,3 +21,6 @@ matrix:
       env: CONN=hiredis
     - rvm: jruby-19mode
       env: CONN=hiredis
+  allow_failures:
+    - rvm: jruby-head
+      env: CONN=ruby
