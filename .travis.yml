@@ -3,6 +3,7 @@ before_install:
   - sudo apt-get update
   - sudo apt-get install redis-server
 before_script:
+  - sudo /etc/init.d/redis-server restart
   - bundle install
 script:
   - bundle exec rake spec:coveralls
