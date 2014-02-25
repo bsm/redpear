@@ -1,6 +1,6 @@
 language: ruby
 install: 
-  - sudo apt-get install redis
+  - sudo apt-get install redis-server
 rvm:
   - 2.0.0
   - 1.9.3
