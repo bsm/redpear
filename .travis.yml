@@ -1,6 +1,7 @@
 language: ruby
 install: 
   - sudo apt-get install redis-server
+  - bundle install
 rvm:
   - 2.0.0
   - 1.9.3
@@ -11,7 +12,8 @@ gemfile:
 env:
   - CONN=hiredis
   - CONN=ruby
-script: bundle exec rake spec:coveralls
+script: 
+  - bundle exec rake spec:coveralls
 
 matrix:
   exclude:
