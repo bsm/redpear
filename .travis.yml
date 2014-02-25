@@ -1,25 +1,24 @@
 language: ruby
-install: 
+before_install: 
+  - sudo apt-get update
   - sudo apt-get install redis-server
+before_script:
   - bundle install
+script:
+  - bundle exec rake spec:coveralls
+
 rvm:
   - 2.0.0
   - 1.9.3
   - jruby-19mode
   - jruby-head
-gemfile:
-  - .travis/Gemfile
 env:
   - CONN=hiredis
   - CONN=ruby
-script: 
-  - bundle exec rake spec:coveralls
 
 matrix:
   exclude:
     - rvm: jruby-head
-      gemfile: .travis/Gemfile
       env: CONN=hiredis
     - rvm: jruby-19mode
-      gemfile: .travis/Gemfile
       env: CONN=hiredis
