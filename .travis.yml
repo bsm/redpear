@@ -1,5 +1,5 @@
 language: ruby
-before_install: 
+before_install:
   - sudo apt-get update
   - sudo apt-get install redis-server
   - sudo service redis-server start
@@ -7,6 +7,7 @@ script:
   - bundle exec rake spec:coveralls
 
 rvm:
+  - 2.1.1
   - 2.0.0
   - 1.9.3
   - jruby-19mode
