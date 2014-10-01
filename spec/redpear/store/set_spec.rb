@@ -10,126 +10,126 @@ describe Redpear::Store::Set do
     described_class.new 'other', connection
   end
 
-  it { should be_a(Redpear::Store::Enumerable) }
+  it { is_expected.to be_a(Redpear::Store::Enumerable) }
 
   it 'should return all members' do
-    subject.members.should == []
-    subject.all.should == Set.new
+    expect(subject.members).to eq([])
+    expect(subject.all).to eq(Set.new)
 
     subject.add('a')
-    subject.to_set.should == ['a'].to_set
-    subject.to_a.should == ['a']
+    expect(subject.to_set).to eq(['a'].to_set)
+    expect(subject.to_a).to eq(['a'])
   end
 
   it 'should have a value' do
-    subject.value.should == subject.all
+    expect(subject.value).to eq(subject.all)
   end
 
   it 'should return the length' do
-    subject.length.should == 0
+    expect(subject.length).to eq(0)
     subject.add('a')
-    subject.length.should == 1
+    expect(subject.length).to eq(1)
   end
 
   it 'should add values' do
-    subject.length.should == 0
+    expect(subject.length).to eq(0)
     subject.add('a')
     subject.add('b')
-    subject.length.should == 2
+    expect(subject.length).to eq(2)
   end
 
   it 'should delete values' do
     subject.add('a')
-    subject.length.should == 1
+    expect(subject.length).to eq(1)
     subject.delete('a')
-    subject.length.should == 0
+    expect(subject.length).to eq(0)
   end
 
   it 'should check if empty' do
-    subject.should be_empty
+    expect(subject).to be_empty
     subject.add('a')
-    subject.should_not be_empty
+    expect(subject).not_to be_empty
   end
 
   it 'should check if value is included' do
-    subject.include?('a').should be(false)
+    expect(subject.include?('a')).to be(false)
     subject.add('a')
-    subject.include?('a').should be(true)
+    expect(subject.include?('a')).to be(true)
   end
 
   it 'should pop random values' do
-    subject.pop.should be_nil
+    expect(subject.pop).to be_nil
     subject.add('a')
-    subject.pop.should == 'a'
-    subject.should be_empty
+    expect(subject.pop).to eq('a')
+    expect(subject).to be_empty
   end
 
   it 'should be comparable' do
     subject << 'a' << 'b' << 'c'
-    subject.should == ['a', 'b', 'c']
-    subject.should == ['a', 'b', 'c'].to_set
+    expect(subject).to eq(['a', 'b', 'c'])
+    expect(subject).to eq(['a', 'b', 'c'].to_set)
   end
 
   it 'should return random members' do
-    subject.random.should be_nil
+    expect(subject.random).to be_nil
     subject << 'a'
-    subject.random.should == 'a'
-    subject.should == ['a']
+    expect(subject.random).to eq('a')
+    expect(subject).to eq(['a'])
   end
 
   it 'should subtract sets' do
     subject << 'a' << 'b'
     other   << 'a' << 'c'
-    (subject - other).should == ['b']
-    (subject - "other").should == ['b']
+    expect(subject - other).to eq(['b'])
+    expect(subject - "other").to eq(['b'])
   end
 
   it 'should subtract sets and store results' do
     subject << 'a' << 'b'
     other   << 'a' << 'c'
     result = subject.diffstore('target', other)
-    result.should be_a(described_class)
-    result.key.should == "target"
-    result.should == ['b']
+    expect(result).to be_a(described_class)
+    expect(result.key).to eq("target")
+    expect(result).to eq(['b'])
   end
 
   it 'should union sets' do
     subject << 'a' << 'b' << 'c'
     other   << 'a' << 'd'
-    (subject + other).should =~ ['a', 'b', 'c', 'd']
+    expect(subject + other).to match_array(['a', 'b', 'c', 'd'])
   end
 
   it 'should build union and store results' do
     subject << 'a' << 'b' << 'c'
     other   << 'a' << 'd'
     result = subject.unionstore('target', other)
-    result.should be_a(described_class)
-    result.key.should == "target"
-    result.should == ['a', 'b', 'c', 'd']
+    expect(result).to be_a(described_class)
+    expect(result.key).to eq("target")
+    expect(result).to eq(['a', 'b', 'c', 'd'])
   end
 
   it 'should build intersections' do
     subject << 'a' << 'b' << 'c'
     other   << 'a' << 'c' << 'd'
-    (subject & other).should =~ ['a', 'c']
+    expect(subject & other).to match_array(['a', 'c'])
   end
 
   it 'should build intersections and store results' do
     subject << 'a' << 'b' << 'c'
     other   << 'a' << 'c' << 'd'
     result = subject.interstore('target', other)
-    result.should be_a(described_class)
-    result.key.should == "target"
-    result.should == ['a', 'c']
+    expect(result).to be_a(described_class)
+    expect(result.key).to eq("target")
+    expect(result).to eq(['a', 'c'])
   end
 
   it 'should move members from one set to another' do
     subject.move('other', 'a')
-    other.should == []
+    expect(other).to eq([])
     subject << 'a' << 'b'
     subject.move('other', 'a')
-    other.should == ['a']
-    subject.should == ['b']
+    expect(other).to eq(['a'])
+    expect(subject).to eq(['b'])
   end
 
   it 'should be pipelineable' do
@@ -147,10 +147,10 @@ describe Redpear::Store::Set do
       subject.pop
     end
     res[3].sort!
-    res.should == [
+    expect(res).to eq([
       true, true, ["a", "b"].to_set, ["a", "b"], 2,
       false, true, false, true, "a", "a"
-    ]
+    ])
   end
 
 end

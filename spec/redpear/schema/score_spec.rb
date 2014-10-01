@@ -6,17 +6,17 @@ describe Redpear::Schema::Score do
     described_class.new Comment, :rank
   end
 
-  it { should be_a(Redpear::Schema::Index) }
+  it { is_expected.to be_a(Redpear::Schema::Index) }
 
   it 'should return members store for a record' do
-    subject.for(nil).should be_instance_of(Redpear::Store::SortedSet)
-    subject.for("ignored").key.should == "comments:~:rank"
+    expect(subject.for(nil)).to be_instance_of(Redpear::Store::SortedSet)
+    expect(subject.for("ignored").key).to eq("comments:~:rank")
   end
 
   it 'should return members store' do
-    subject.members.key.should == "comments:~:rank"
-    subject.members.should be_instance_of(Redpear::Store::SortedSet)
-    subject.members.should be_empty
+    expect(subject.members.key).to eq("comments:~:rank")
+    expect(subject.members).to be_instance_of(Redpear::Store::SortedSet)
+    expect(subject.members).to be_empty
   end
 
 end

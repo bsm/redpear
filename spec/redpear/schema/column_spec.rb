@@ -22,66 +22,66 @@ describe Redpear::Schema::Column do
     described_class.new Post, :hits, 'counter'
   end
 
-  it { should be_a(String) }
+  it { is_expected.to be_a(String) }
 
   it 'should have a name' do
-    subject.should == "name"
-    counter.should == "hits"
+    expect(subject).to eq("name")
+    expect(counter).to eq("hits")
 
-    subject.should be_instance_of(described_class)
-    subject.name.should be_instance_of(String)
+    expect(subject).to be_instance_of(described_class)
+    expect(subject.name).to be_instance_of(String)
   end
 
   it 'should have a type' do
-    subject.type.should be_nil
-    counter.type.should == :counter
-    timestamp.type.should == :timestamp
+    expect(subject.type).to be_nil
+    expect(counter.type).to eq(:counter)
+    expect(timestamp.type).to eq(:timestamp)
   end
 
   it 'should determine readable status' do
-    subject.should be_readable
-    integer.should be_readable
-    counter.should be_readable
-    timestamp.should be_readable
+    expect(subject).to be_readable
+    expect(integer).to be_readable
+    expect(counter).to be_readable
+    expect(timestamp).to be_readable
   end
 
   it 'should determine writable status' do
-    subject.should be_writable
-    integer.should be_writable
-    counter.should be_writable
-    timestamp.should be_writable
+    expect(subject).to be_writable
+    expect(integer).to be_writable
+    expect(counter).to be_writable
+    expect(timestamp).to be_writable
   end
 
   it 'should type-cast values' do
-    subject.type_cast("a").should == "a"
+    expect(subject.type_cast("a")).to eq("a")
 
-    integer.type_cast(nil).should == nil
-    integer.type_cast("a").should == nil
-    integer.type_cast("12.3").should == nil
-    integer.type_cast("123").should == 123
-    integer.type_cast("-123").should == -123
+    expect(integer.type_cast(nil)).to eq(nil)
+    expect(integer.type_cast("a")).to eq(nil)
+    expect(integer.type_cast("12.3")).to eq(nil)
+    expect(integer.type_cast("123")).to eq(123)
+    expect(integer.type_cast("-123")).to eq(-123)
 
-    float.type_cast(nil).should == nil
-    float.type_cast("a").should == nil
-    float.type_cast("123").should == 123.0
-    float.type_cast("12.3").should == 12.3
-    float.type_cast("-12.3").should == -12.3
+    expect(float.type_cast(nil)).to eq(nil)
+    expect(float.type_cast("a")).to eq(nil)
+    expect(float.type_cast("123")).to eq(123.0)
+    expect(float.type_cast("12.3")).to eq(12.3)
+    expect(float.type_cast("-12.3")).to eq(-12.3)
 
-    counter.type_cast(nil).should == 0
-    counter.type_cast("a").should == 0
-    counter.type_cast("12.3").should == 0
-    counter.type_cast("123").should == 123
-    counter.type_cast("-123").should == -123
+    expect(counter.type_cast(nil)).to eq(0)
+    expect(counter.type_cast("a")).to eq(0)
+    expect(counter.type_cast("12.3")).to eq(0)
+    expect(counter.type_cast("123")).to eq(123)
+    expect(counter.type_cast("-123")).to eq(-123)
 
-    timestamp.type_cast(nil).should == nil
-    timestamp.type_cast("a").should == nil
-    timestamp.type_cast("1313131313").should == Time.at(1313131313)
+    expect(timestamp.type_cast(nil)).to eq(nil)
+    expect(timestamp.type_cast("a")).to eq(nil)
+    expect(timestamp.type_cast("1313131313")).to eq(Time.at(1313131313))
   end
 
   it 'should encode values' do
-    subject.encode_value("123").should == "123"
-    subject.encode_value(123).should == 123
-    subject.encode_value(Time.at(1313131313)).should == 1313131313
+    expect(subject.encode_value("123")).to eq("123")
+    expect(subject.encode_value(123)).to eq(123)
+    expect(subject.encode_value(Time.at(1313131313))).to eq(1313131313)
   end
 
 end

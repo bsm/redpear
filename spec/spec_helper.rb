@@ -2,6 +2,8 @@ require 'rubygems'
 require 'bundler/setup'
 
 require 'rspec'
+require 'rspec/its'
+
 case ENV['CONN']
 when 'hiredis'
   require 'redis/connection/hiredis'

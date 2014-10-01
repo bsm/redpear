@@ -6,67 +6,67 @@ describe Redpear::Store::Value do
     described_class.new "value:key", connection
   end
 
-  it { should be_a(Redpear::Store::Base) }
+  it { is_expected.to be_a(Redpear::Store::Base) }
 
   it 'should have a custom inspect' do
-    subject.inspect.should == "#<Redpear::Store::Value value:key: nil>"
+    expect(subject.inspect).to eq("#<Redpear::Store::Value value:key: nil>")
     subject.value = "abcd"
-    subject.inspect.should == %(#<Redpear::Store::Value value:key: "abcd">)
+    expect(subject.inspect).to eq(%(#<Redpear::Store::Value value:key: "abcd">))
   end
 
   it 'should delete values' do
-    subject.exists?.should be(false)
+    expect(subject.exists?).to be(false)
     subject.value = "abcd"
-    subject.exists?.should be(true)
+    expect(subject.exists?).to be(true)
     subject.delete
-    subject.exists?.should be(false)
+    expect(subject.exists?).to be(false)
   end
 
   it 'should read values' do
-    subject.get.should be_nil
+    expect(subject.get).to be_nil
     subject.value = "abcd"
-    subject.value.should == "abcd"
-    subject.get.should == "abcd"
+    expect(subject.value).to eq("abcd")
+    expect(subject.get).to eq("abcd")
   end
 
   it 'should write values' do
     subject.value = "abcd"
-    subject.should == "abcd"
+    expect(subject).to eq("abcd")
     subject.set "dcab"
-    subject.should == "dcab"
+    expect(subject).to eq("dcab")
     subject.replace "aaa"
-    subject.should == "aaa"
+    expect(subject).to eq("aaa")
   end
 
   it 'should append values' do
     subject.value = "abcd"
     subject.append 'e'
     subject << 'f'
-    subject.should == "abcdef"
+    expect(subject).to eq("abcdef")
   end
 
   it 'should be comparable' do
-    subject.should == nil
+    expect(subject).to eq(nil)
     subject.set "ab"
-    subject.should == "ab"
-    subject.should_not == "ba"
+    expect(subject).to eq("ab")
+    expect(subject).not_to eq("ba")
   end
 
   it 'should check if nil' do
-    subject.should be_nil
+    expect(subject).to be_nil
     subject.value = "abcd"
-    subject.should_not be_nil
+    expect(subject).not_to be_nil
   end
 
   it 'should delegate to the actual value' do
-    subject.size.should == 0
+    expect(subject.size).to eq(0)
     subject.value = "abcd"
-    subject.size.should == 4
-    subject.reverse.should == "dcba"
+    expect(subject.size).to eq(4)
+    expect(subject.reverse).to eq("dcba")
   end
 
   it 'should be pipelineable' do
-    connection.pipelined do
+    expect(connection.pipelined do
       subject.nil?
       subject.get
       subject.set "ab"
@@ -79,11 +79,11 @@ describe Redpear::Store::Value do
       subject.exists?
       subject.delete
       subject.exists?
-    end.should == [
+    end).to eq([
       true, nil, "OK", false,
       "ab", "OK", true, 3, false,
       true, true, false
-    ]
+    ])
   end
 
 end

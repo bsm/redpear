@@ -14,8 +14,8 @@ describe Redpear::Store::Base do
 
     it "should create temporary keys" do
       Redpear::Store::Value.temporary connection do |target|
-        target.should be_instance_of(Redpear::Store::Value)
-        target.to_s.should match(/\A[0-9a-f]{40}\z/)
+        expect(target).to be_instance_of(Redpear::Store::Value)
+        expect(target.to_s).to match(/\A[0-9a-f]{40}\z/)
       end
     end
 
@@ -24,111 +24,114 @@ describe Redpear::Store::Base do
       Redpear::Store::Value.temporary connection do |store|
         yielded = store
         store.set 'a'
-        store.exists?.should be(true)
+        expect(store.exists?).to be(true)
       end
-      yielded.should be_instance_of(Redpear::Store::Value)
-      yielded.exists?.should be(false)
+      expect(yielded).to be_instance_of(Redpear::Store::Value)
+      expect(yielded.exists?).to be(false)
     end
 
     it "should never override existing keys" do
       record.set "present"
-      SecureRandom.should_receive(:hex).twice.and_return(record.key, "next:key")
+      expect(SecureRandom).to receive(:hex).twice.and_return(record.key, "next:key")
       Redpear::Store::Value.temporary connection do |store|
-        store.to_s.should == "next:key"
+        expect(store.to_s).to eq("next:key")
       end
-      record.should == "present"
+      expect(record).to eq("present")
     end
 
     it "should allow to specify prefixes" do
       Redpear::Store::Value.temporary connection, :prefix => "temp:" do |store|
-        store.to_s.should include("temp:")
-        store.to_s.size.should == 45
+        expect(store.to_s).to include("temp:")
+        expect(store.to_s.size).to eq(45)
       end
     end
 
   end
 
-  its(:value) { should be_nil }
+  describe '#value' do
+    subject { super().value }
+    it { is_expected.to be_nil }
+  end
 
   it 'should have a key' do
-    subject.key.should == "base:key"
-    subject.to_s.should == "base:key"
+    expect(subject.key).to eq("base:key")
+    expect(subject.to_s).to eq("base:key")
   end
 
   it 'should have a connection' do
-    subject.conn.should be(connection)
+    expect(subject.conn).to be(connection)
   end
 
   it 'should have a custom inspect' do
-    subject.inspect.should == %(#<Redpear::Store::Base base:key: nil>)
+    expect(subject.inspect).to eq(%(#<Redpear::Store::Base base:key: nil>))
   end
 
   it 'should have a ttl' do
-    subject.ttl.should be_nil
-    record.ttl.should be_nil
+    expect(subject.ttl).to be_nil
+    expect(record.ttl).to be_nil
     record.set "abcd"
     record.expire(10)
-    record.ttl.should <= 10
+    expect(record.ttl).to be <= 10
   end
 
   it 'should allow to expire records via timestamps' do
     record.set "abcd"
-    record.expire(Time.now + 3600).should be(true)
-    record.ttl.should > 3590
-    record.ttl.should <= 3600
+    expect(record.expire(Time.now + 3600)).to be(true)
+    expect(record.ttl).to be > 3590
+    expect(record.ttl).to be <= 3600
   end
 
   it 'should allow to expire records via numeric periods' do
     record.set "abcd"
-    record.expire(3600).should be(true)
-    record.ttl.should > 3590
-    record.ttl.should <= 3600
+    expect(record.expire(3600)).to be(true)
+    expect(record.ttl).to be > 3590
+    expect(record.ttl).to be <= 3600
   end
 
   it 'should allow to expire records via period strings' do
     record.set "abcd"
-    record.expire("3600").should be(true)
-    record.ttl.should > 3590
-    record.ttl.should <= 3600
+    expect(record.expire("3600")).to be(true)
+    expect(record.ttl).to be > 3590
+    expect(record.ttl).to be <= 3600
   end
 
   it 'should not expire non-existing records' do
-    record.expire("3600").should be(false)
+    expect(record.expire("3600")).to be(false)
     record.set "abcd"
-    record.expire("3600").should be(true)
+    expect(record.expire("3600")).to be(true)
   end
 
   it 'should check key existence' do
-    record.exists?.should be(false)
+    expect(record.exists?).to be(false)
     record.set 'abcd'
-    record.exists?.should be(true)
+    expect(record.exists?).to be(true)
   end
 
   it 'should allow to watch a key' do
-    record.watch.should be(true)
-    record.watch { }.should be(true) # with block
+    expect(record.watch).to be(true)
+    expect(record.watch { }).to be(true) # with block
   end
 
   it 'should allow purging records' do
     record.set 'abcd'
-    record.exists?.should be(true)
-    record.purge!.should be(true)
-    record.purge!.should be(false)
-    record.exists?.should be(false)
+    expect(record.exists?).to be(true)
+    expect(record.purge!).to be(true)
+    expect(record.purge!).to be(false)
+    expect(record.exists?).to be(false)
   end
 
   it 'should allow clearing records' do
     record.set 'abcd'
-    record.exists?.should be(true)
-    record.clear.should be_nil
-    record.exists?.should be(false)
+    expect(record.exists?).to be(true)
+    expect(record.clear).to be_nil
+    expect(record.exists?).to be(false)
   end
 
   it 'should return type information' do
-    subject.type.should == :none
-    record.type.should == :none
+    expect(subject.type).to eq(:none)
+    expect(record.type).to eq(:none)
     record.set 'abcd'
-    record.type.should == :string
+    expect(record.type).to eq(:string)
   end
 
 end

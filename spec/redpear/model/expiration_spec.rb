@@ -5,30 +5,30 @@ describe Redpear::Model::Expiration do
   subject { Post.new :title => 'Any' }
 
   it 'should ignore invalid expire values' do
-    subject.expire(nil).should be(false)
-    subject.expire(false).should be(false)
-    subject.expire("ABC").should be(false)
+    expect(subject.expire(nil)).to be(false)
+    expect(subject.expire(false)).to be(false)
+    expect(subject.expire("ABC")).to be(false)
   end
 
   it 'should allow to expire records via timestamps' do
-    subject.expire(Time.now + 3600).should be(true)
-    subject.ttl.should > 0
-    subject.ttl.should <= 3600
+    expect(subject.expire(Time.now + 3600)).to be(true)
+    expect(subject.ttl).to be > 0
+    expect(subject.ttl).to be <= 3600
   end
 
   it 'should allow to expire records via numeric periods' do
-    subject.expire(3600).should be(true)
-    subject.ttl.should > 0
-    subject.ttl.should <= 3600
+    expect(subject.expire(3600)).to be(true)
+    expect(subject.ttl).to be > 0
+    expect(subject.ttl).to be <= 3600
   end
 
   it 'should return negative ttl for non-expiring records' do
-    subject.ttl.should be_nil
+    expect(subject.ttl).to be_nil
   end
 
   it 'should return a positive ttl for expiring records' do
     subject.expire(30)
-    subject.ttl.should > 0
+    expect(subject.ttl).to be > 0
   end
 
 end

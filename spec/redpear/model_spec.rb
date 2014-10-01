@@ -5,19 +5,19 @@ describe Redpear::Model do
   describe "connection" do
 
     it 'should have a default' do
-      User.connection.should be_instance_of(Redis)
+      expect(User.connection).to be_instance_of(Redis)
     end
 
     it 'can have a custom' do
-      Manager.connection.should be_instance_of(ManagerConnection)
+      expect(Manager.connection).to be_instance_of(ManagerConnection)
     end
 
     it 'should be inheritable' do
-      Employee.connection.should be(User.connection)
+      expect(Employee.connection).to be(User.connection)
     end
 
     it 'should be overridable' do
-      User.should respond_to(:connection=)
+      expect(User).to respond_to(:connection=)
     end
 
   end
@@ -26,29 +26,29 @@ describe Redpear::Model do
     subject { Post }
 
     it 'should have members' do
-      subject.members.should be_instance_of(Redpear::Store::Set)
-      subject.members.should == []
+      expect(subject.members).to be_instance_of(Redpear::Store::Set)
+      expect(subject.members).to eq([])
     end
 
     it 'should have a PK counter' do
-      subject.pk_counter.should be_instance_of(Redpear::Store::Counter)
-      subject.pk_counter.next.should == 1
+      expect(subject.pk_counter).to be_instance_of(Redpear::Store::Counter)
+      expect(subject.pk_counter.next).to eq(1)
     end
 
     it 'should have a create alias for new' do
-      subject.create.should be_instance_of(subject)
+      expect(subject.create).to be_instance_of(subject)
     end
 
     it 'should have a scope' do
-      subject.scope.should == "posts"
+      expect(subject.scope).to eq("posts")
     end
 
     it 'can have a custom scope' do
-      Manager.scope.should == "execs"
+      expect(Manager.scope).to eq("execs")
     end
 
     it 'should build nested keys' do
-      subject.nested_key(1, 2, "X").should == "posts:1:2:X"
+      expect(subject.nested_key(1, 2, "X")).to eq("posts:1:2:X")
     end
 
     it 'should allow transactions' do
@@ -58,70 +58,68 @@ describe Redpear::Model do
         subject.pk_counter.next
         subject.pk_counter.next
       end
-      subject.pk_counter.should == 3
+      expect(subject.pk_counter).to eq(3)
 
       Post.transaction do
         Post.new :id => 1, :title => "A", :rank => 1, :user_id => 1
         Post.new :id => 2, :title => "A", :rank => 2, :user_id => 2
       end
-      Post.count.should == 2
+      expect(Post.count).to eq(2)
     end
 
   end
 
-  it { should be_a(Hash) }
+  it { is_expected.to be_a(Hash) }
 
   it 'should be comparable' do
-    Post.new(:id => 1).should == Post.new(:id => 1)
-    Post.new(:id => 1).should == Post.new(:id => 1, :title => nil)
-    Post.new(:id => 1, :title => "A").should == Post.new(:id => 1, :title => "B")
-    Post.new(:id => 999).should_not == Post.new
-    Post.new(:id => 1).should_not == Post.new(:id => 2)
+    expect(Post.new(:id => 1)).to eq(Post.new(:id => 1))
+    expect(Post.new(:id => 1)).to eq(Post.new(:id => 1, :title => nil))
+    expect(Post.new(:id => 1, :title => "A")).to eq(Post.new(:id => 1, :title => "B"))
+    expect(Post.new(:id => 999)).not_to eq(Post.new)
+    expect(Post.new(:id => 1)).not_to eq(Post.new(:id => 2))
 
-    Post.new.should_not == Post.new
-    Post.new.should_not == Comment.new
-    Post.new(:id => 1).should_not == Comment.new(:id => 1)
-
-    [Post.new(:id => 1), Post.new(:id => 2)].should =~ [Post.new(:id => 2), Post.new(:id => 1)]
+    expect(Post.new).not_to eq(Post.new)
+    expect(Post.new).not_to eq(Comment.new)
+    expect(Post.new(:id => 1)).not_to eq(Comment.new(:id => 1))
   end
 
   it 'should allow clearing attribute cache' do
     post = Post.new(:id => 1, :title => 'A Title')
     post.title
-    post.should == {'id' => '1', 'title' => 'A Title'}
-    post.clear.should == {'id' => '1'}
-    post.should == {'id' => '1'}
+    expect(post).to eq({'id' => '1', 'title' => 'A Title'})
+    expect(post.clear).to eq({'id' => '1'})
+    expect(post).to eq({'id' => '1'})
   end
 
   it 'should give access to raw attributes' do
     post = Post.new(:id => 1, :title => 'A Title')
-    post.attributes.should be_instance_of(Redpear::Store::Hash)
-    post.attributes.should == { 'title' => 'A Title' }
-    post.attributes.to_s.should == "posts::1"
+    expect(post.attributes).to be_instance_of(Redpear::Store::Hash)
+    expect(post.attributes).to eq({ 'title' => 'A Title' })
+    expect(post.attributes.to_s).to eq("posts::1")
   end
 
   it 'should give access to raw lookups' do
     post = Post.new(:id => 1, :title => 'A Title', :user_id => 2)
-    post.should have(3).lookups
-    post.lookups.map(&:to_s).should =~ ["posts:~", "posts:~:rank", "posts:~:user_id:2"]
+    expect(post.lookups.count).to eq(3)
+    expect(post.lookups.map(&:to_s)).to match_array(["posts:~", "posts:~:rank", "posts:~:user_id:2"])
   end
 
   describe "initialization" do
 
     it 'should initialize with ID' do
-      subject.should == { 'id' => described_class.pk_counter.value.to_s }
+      expect(subject).to eq({ 'id' => described_class.pk_counter.value.to_s })
     end
 
     it 'should initialize with custom ID' do
-      described_class.new('id' => 123).should == { 'id' => '123' }
-      described_class.new(:id => '123').should == { 'id' => '123' }
+      expect(described_class.new('id' => 123)).to eq({ 'id' => '123' })
+      expect(described_class.new(:id => '123')).to eq({ 'id' => '123' })
     end
 
     it 'should initialize with attributes' do
-      Post.new('id' => 1, :title => "A Title").attributes.should == { 'title' => 'A Title' }
-      Post.new('id' => 2, :title => "A Title", :ignore => 'me').attributes.should == { 'title' => 'A Title' }
-      Post.new('id' => 3, :rank => "10", :ignore => 'me').attributes.should == {}
-      Post.columns[:rank].members.should == [["3", 10]]
+      expect(Post.new('id' => 1, :title => "A Title").attributes).to eq({ 'title' => 'A Title' })
+      expect(Post.new('id' => 2, :title => "A Title", :ignore => 'me').attributes).to eq({ 'title' => 'A Title' })
+      expect(Post.new('id' => 3, :rank => "10", :ignore => 'me').attributes).to eq({})
+      expect(Post.columns[:rank].members).to eq([["3", 10]])
     end
 
   end
@@ -131,60 +129,60 @@ describe Redpear::Model do
 
     it 'should read & cache single attributes' do
       Post.new(:id => 1, :title => 'A Title')
-      subject.should == {'id' => '1'}
-      subject['title'].should == 'A Title'
-      subject.should == {'id' => '1', 'title' => 'A Title'}
+      expect(subject).to eq({'id' => '1'})
+      expect(subject['title']).to eq('A Title')
+      expect(subject).to eq({'id' => '1', 'title' => 'A Title'})
 
       subject.attributes['title'] = 'New Title'
-      subject['title'].should == 'A Title'
+      expect(subject['title']).to eq('A Title')
     end
 
     it 'should read & cache single scores' do
       Post.new(:id => 1, :rank => 10)
-      subject.should == {'id' => '1'}
-      subject['rank'].should == 10
-      subject.should == {'id' => '1', 'rank' => 10}
+      expect(subject).to eq({'id' => '1'})
+      expect(subject['rank']).to eq(10)
+      expect(subject).to eq({'id' => '1', 'rank' => 10})
 
       Post.columns['rank'].members[1] = 20
-      subject['rank'].should == 10
+      expect(subject['rank']).to eq(10)
     end
 
     it 'should write single attributes' do
-      subject.should == {'id' => '1'}
+      expect(subject).to eq({'id' => '1'})
       subject['title'] = 'New Title'
-      subject.should == {'id' => '1'}
+      expect(subject).to eq({'id' => '1'})
       subject.attributes == {'title' => 'New Title'}
-      subject.title.should == 'New Title'
+      expect(subject.title).to eq('New Title')
     end
 
     it 'should write single indicies' do
-      subject.should == {'id' => '1'}
+      expect(subject).to eq({'id' => '1'})
       subject['user_id'] = 123
-      subject.should == { 'id' => '1' }
+      expect(subject).to eq({ 'id' => '1' })
       subject.attributes == { 'user_id' => '123' }
-      Post.columns['user_id'].members(123).should == ["1"]
-      subject.user_id.should == "123"
+      expect(Post.columns['user_id'].members(123)).to eq(["1"])
+      expect(subject.user_id).to eq("123")
     end
 
     it 'should NOT write indicies if NULL' do
-      subject.should == {'id' => '1'}
+      expect(subject).to eq({'id' => '1'})
       subject['user_id'] = nil
-      Post.columns['user_id'].members(nil).should == []
+      expect(Post.columns['user_id'].members(nil)).to eq([])
     end
 
     it 'should write single scores' do
-      subject.should == {'id' => '1'}
+      expect(subject).to eq({'id' => '1'})
       subject['rank'] = 10
-      subject.should == { 'id' => '1' }
+      expect(subject).to eq({ 'id' => '1' })
       subject.attributes == {}
-      Post.columns['rank'].members[1].should == 10
-      subject.rank.should == 10
+      expect(Post.columns['rank'].members[1]).to eq(10)
+      expect(subject.rank).to eq(10)
     end
 
     it 'should NOT write scores if NULL' do
-      subject.should == {'id' => '1'}
+      expect(subject).to eq({'id' => '1'})
       subject['rank'] = nil
-      Post.columns['rank'].members[1].should be_nil
+      expect(Post.columns['rank'].members[1]).to be_nil
     end
 
   end
@@ -193,40 +191,40 @@ describe Redpear::Model do
     subject { Post.new(:id => 1).update(:title => 'A Title', :rank => 10, :user_id => 2) }
 
     it 'should update columns' do
-      subject.attributes.should == {"title"=>"A Title", "user_id"=>"2"}
-      subject.title.should == "A Title"
+      expect(subject.attributes).to eq({"title"=>"A Title", "user_id"=>"2"})
+      expect(subject.title).to eq("A Title")
     end
 
     it 'should update indicies' do
-      subject.attributes.should == {"title" => "A Title", "user_id" => "2"}
-      subject.user_id.should == "2"
-      Post.columns['user_id'].members('2').should == [subject.id]
+      expect(subject.attributes).to eq({"title" => "A Title", "user_id" => "2"})
+      expect(subject.user_id).to eq("2")
+      expect(Post.columns['user_id'].members('2')).to eq([subject.id])
     end
 
     it 'should NOT update indicies if NULL' do
       post = Post.new :id => 2
-      post.user_id.should be_nil
-      Post.columns['user_id'].members(nil).should == []
+      expect(post.user_id).to be_nil
+      expect(Post.columns['user_id'].members(nil)).to eq([])
     end
 
     it 'should update scores' do
-      subject.attributes.should == {"title"=>"A Title", "user_id"=>"2"}
-      subject.user_id.should == "2"
-      Post.columns['rank'].members[subject.id].should == 10
+      expect(subject.attributes).to eq({"title"=>"A Title", "user_id"=>"2"})
+      expect(subject.user_id).to eq("2")
+      expect(Post.columns['rank'].members[subject.id]).to eq(10)
     end
 
     it 'should NOT update scores if NULL' do
       post = Post.new :id => 2
-      post.rank.should be_nil
-      Post.columns['rank'].members[post.id].should be_nil
+      expect(post.rank).to be_nil
+      expect(Post.columns['rank'].members[post.id]).to be_nil
     end
 
     it 'should clear cache' do
       subject.title
-      subject.should == {"id" => "1", "title"=>"A Title"}
+      expect(subject).to eq({"id" => "1", "title"=>"A Title"})
       subject.update('rank' => 5)
-      subject.should == {"id" => "1"}
-      Post.columns['rank'].members[subject.id].should == 5
+      expect(subject).to eq({"id" => "1"})
+      expect(Post.columns['rank'].members[subject.id]).to eq(5)
     end
 
   end
@@ -236,22 +234,22 @@ describe Redpear::Model do
     let(:post) { Post.new(:id => 1, :votes => 10) }
 
     it 'should increment counters' do
-      subject.increment('votes').should == 1
-      subject.should == {'id' => '1', 'votes' => 1}
+      expect(subject.increment('votes')).to eq(1)
+      expect(subject).to eq({'id' => '1', 'votes' => 1})
       subject.increment 'votes', 5
-      subject.should == {'id' => '1', 'votes' => 6}
+      expect(subject).to eq({'id' => '1', 'votes' => 6})
     end
 
     it 'should decrement counters' do
-      post.decrement('votes').should == 9
-      post.should == {'id' => '1', 'votes' => 9}
+      expect(post.decrement('votes')).to eq(9)
+      expect(post).to eq({'id' => '1', 'votes' => 9})
       post.decrement 'votes', 5
-      post.should == {'id' => '1', 'votes' => 4}
+      expect(post).to eq({'id' => '1', 'votes' => 4})
     end
 
     it 'should not in/decrement non-counters' do
-      subject.increment('title').should be(false)
-      subject.should == {'id' => '1'}
+      expect(subject.increment('title')).to be(false)
+      expect(subject).to eq({'id' => '1'})
     end
 
   end
@@ -260,47 +258,47 @@ describe Redpear::Model do
     subject { Post.new :id => 1, :user_id => 5, :rank => 20 }
 
     it 'should destroy records' do
-      lambda {
-        subject.destroy.should == subject
-      }.should change { subject.class.exists?(subject.id) }.from(true).to(false)
+      expect {
+        expect(subject.destroy).to eq(subject)
+      }.to change { subject.class.exists?(subject.id) }.from(true).to(false)
     end
 
     it 'should remove ID from the members index' do
-      lambda {
+      expect {
         subject.destroy
-      }.should change { subject.class.members.to_a }.from(['1']).to([])
+      }.to change { subject.class.members.to_a }.from(['1']).to([])
     end
 
     it 'should remove ID from index lookups' do
       lookup = subject.class.columns[:user_id].members('5')
-      lambda {
+      expect {
         subject.destroy
-      }.should change { lookup.to_a }.from(['1']).to([])
+      }.to change { lookup.to_a }.from(['1']).to([])
     end
 
     it 'should remove ID from scores' do
       lookup = subject.class.columns[:rank].members
-      lambda {
+      expect {
         subject.destroy
-      }.should change { lookup.to_a }.from([['1', 20]]).to([])
+      }.to change { lookup.to_a }.from([['1', 20]]).to([])
     end
 
     it 'should allow shortcut-destroy records' do
-      lambda {
+      expect {
         Post.destroy(subject.id)
-      }.should change { subject.class.exists?(subject.id) }.from(true).to(false)
+      }.to change { subject.class.exists?(subject.id) }.from(true).to(false)
     end
 
     it 'should freeze destroyed records' do
       subject.destroy
-      subject.should be_frozen
+      expect(subject).to be_frozen
     end
 
     it 'should prevent users from modifying destroyed records' do
       subject.destroy
-      subject['title'].should be_nil
-      lambda { subject['title'] = "New Title" }.should raise_error(RuntimeError, /frozen/)
-      lambda { subject.update 'title' => "New Title" }.should raise_error(RuntimeError, /frozen/)
+      expect(subject['title']).to be_nil
+      expect { subject['title'] = "New Title" }.to raise_error(RuntimeError, /frozen/)
+      expect { subject.update 'title' => "New Title" }.to raise_error(RuntimeError, /frozen/)
     end
 
   end

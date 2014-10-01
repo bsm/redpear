@@ -31,15 +31,15 @@ describe Redpear::Concern do
   end
 
   it 'should extend instance methods' do
-    subject.should respond_to(:i_method)
-    subject.should_not respond_to(:c_method)
-    subject.i_method.should == :i
+    expect(subject).to respond_to(:i_method)
+    expect(subject).not_to respond_to(:c_method)
+    expect(subject.i_method).to eq(:i)
   end
 
   it 'should extend class methods' do
-    subject.class.should respond_to(:c_method)
-    subject.class.should_not respond_to(:i_method)
-    subject.class.c_method.should == :c
+    expect(subject.class).to respond_to(:c_method)
+    expect(subject.class).not_to respond_to(:i_method)
+    expect(subject.class.c_method).to eq(:c)
   end
 
 end
