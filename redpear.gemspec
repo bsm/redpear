@@ -3,8 +3,7 @@ require File.expand_path('../lib/redpear/version', __FILE__)
 
 Gem::Specification.new do |s|
   s.platform = Gem::Platform::RUBY
-  s.required_ruby_version = '>= 1.9.0'
-  s.required_rubygems_version = ">= 1.3.6"
+  s.required_ruby_version = '>= 2.2.0'
 
   s.name        = "redpear"
   s.summary     = "Redpear, a Redis ORM"
@@ -24,8 +23,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec"
   s.add_development_dependency "rspec-its"
   s.add_development_dependency "shoulda-matchers"
-  s.add_development_dependency "machinist"
-  s.add_development_dependency "factory_girl"
+  s.add_development_dependency "factory_bot"
   s.add_development_dependency "yard"
   s.add_development_dependency "coveralls"
 end

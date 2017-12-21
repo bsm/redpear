@@ -1,28 +1,28 @@
-require 'factory_girl'
+require 'factory_bot'
 require 'redpear/model'
 
 class Redpear::Model
 
-  # FactoryGirl module for your tests/specs. Example:
+  # FactoryBot module for your tests/specs. Example:
   #
-  #   require 'redpear/model/factory_girl'
+  #   require 'redpear/model/factory_bot'
   #
-  #   FactoryGirl.define do
+  #   FactoryBot.define do
   #     factory :post do
   #       title      { "A Title" }
   #       created_at { Time.at(1313131313) }
   #     end
   #   end
   #
-  module FactoryGirl
+  module FactoryBot
 
-    # @return [Boolean] always true. FactoryGirl requires it.
+    # @return [Boolean] always true. FactoryBot requires it.
     def save!
       after_save({}) # call after_save again
       true
     end
 
   end
-  include FactoryGirl
+  include FactoryBot
 
 end

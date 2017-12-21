@@ -14,7 +14,6 @@ end
 require 'redpear'
 require 'redpear/model'
 require 'support/models'
-require 'support/blueprints'
 require 'support/factories'
 
 count = Redis.current.dbsize

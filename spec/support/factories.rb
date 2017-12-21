@@ -1,6 +1,6 @@
-require 'redpear/model/factory_girl'
+require 'redpear/model/factory_bot'
 
-FactoryGirl.define do
+FactoryBot.define do
 
   factory :post do
     title      { "A Title" }
